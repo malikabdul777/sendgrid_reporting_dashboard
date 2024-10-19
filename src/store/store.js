@@ -21,7 +21,7 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 export const store = configureStore({
   reducer: {
     [masterApiSlice.reducerPath]: masterApiSlice.reducer,
-    persistedReducer,
+    user: persistedReducer, // Correctly assign persistedReducer to the user slice
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }).concat(

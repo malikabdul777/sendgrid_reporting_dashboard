@@ -37,8 +37,6 @@ import Cookies from "js-cookie";
 const Layout = () => {
   const { pathname } = useLocation();
 
-  const { currentUser } = useSelector((state) => state.persistedReducer?.user);
-
   return (
     <div className={styles.container}>
       {pathname === "/" && <Navigate to="/dashboard" />}

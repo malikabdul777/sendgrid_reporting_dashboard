@@ -1,5 +1,4 @@
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
-import { useSelector } from "react-redux";
 
 // Layout
 import Layout from "./components/Layout/Layout";
@@ -16,8 +15,6 @@ import BlockLog from "./pages/BlockLog/BlockLog";
 import DomainAuth from "./pages/DomainAuth/DomainAuth";
 
 function App() {
-  const { currentUser } = useSelector((state) => state.persistedReducer?.user);
-
   return (
     <div>
       <BrowserRouter>
