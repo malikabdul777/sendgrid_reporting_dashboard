@@ -27,7 +27,7 @@ function App() {
             <Route path="spam-reporters" element={<Reporters />} />
 
             {/* Fallback Route */}
-            <Route path="*" element={<Navigate to="/block_log" />} />
+            <Route path="*" element={<Navigate to="/domain-auth" />} />
           </Route>
         </Routes>
       </BrowserRouter>
