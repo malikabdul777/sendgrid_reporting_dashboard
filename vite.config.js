@@ -12,10 +12,6 @@ export default defineConfig({
         __dirname,
         "node_modules/@radix-ui/react-icons"
       ),
-      "@reduxjs/toolkit": path.resolve(
-        __dirname,
-        "node_modules/@reduxjs/toolkit"
-      ),
     },
   },
   build: {
