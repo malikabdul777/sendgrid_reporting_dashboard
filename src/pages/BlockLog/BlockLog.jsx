@@ -42,19 +42,19 @@ const BlockLog = () => {
   const [selectedDomain, setSelectedDomain] = useState(null);
   const [numberOfRecords, setNumberOfRecords] = useState(100);
 
-  const { data: domains } = useGetAllDomainsQuery();
+  // const { data: domains } = useGetAllDomainsQuery();
 
-  const { data: domainEventsData } = useGetDomainEventsQuery({
-    domain: selectedDomain,
-    limit: numberOfRecords,
-  });
+  // const { data: domainEventsData } = useGetDomainEventsQuery({
+  //   domain: selectedDomain,
+  //   limit: numberOfRecords,
+  // });
 
-  console.log(domainEventsData);
+  // console.log(domainEventsData);
 
-  const onDomainDropdownValueChange = (value) => {
-    setSelectedDomain(value);
-    console.log(domains);
-  };
+  // const onDomainDropdownValueChange = (value) => {
+  //   setSelectedDomain(value);
+  //   console.log(domains);
+  // };
 
   return <div>Block Logs</div>;
 };
