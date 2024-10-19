@@ -11,7 +11,11 @@ export default defineConfig({
       "@radix-ui/react-icons": path.resolve(
         __dirname,
         "node_modules/@radix-ui/react-icons"
-      ), // Add this line
+      ),
+      "@reduxjs/toolkit": path.resolve(
+        __dirname,
+        "node_modules/@reduxjs/toolkit"
+      ),
     },
   },
   build: {
