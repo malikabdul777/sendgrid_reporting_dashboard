@@ -9,101 +9,91 @@ import { IoCopyOutline } from "react-icons/io5";
 import { toast } from "react-toastify";
 
 // Utils
-
-// APISlices
-import {
-  useAddDomainMutation,
-  useGetDomainStatusMutation,
-} from "@/store/apiSlices/childApiSlices/cloudflareApiSlice";
-
-// Slice
-
-// CustomHooks
-
-// Components
-
-// Constants
-
-// Enums
-
-// Interfaces
+import axios from "@/utils/axiosInstance"; // Import the Axios instance
 
 // Styles
 import styles from "./AddDomainToCloudflare.module.css";
 import "../../spinner.css";
 
 const AddDomainToCloudflare = () => {
-  const [addDomain, { isLoading: addDomainLoading }] = useAddDomainMutation();
   const [cloudflareDomain, setCloudflareDomain] = useState("");
   const [cloudFlareNameServers, setCloudFlareNameServers] = useState([]);
   const [zoneId, setZoneId] = useState("");
-
-  const [getDomainStatus, { isLoading: getDomainStatusLoading }] =
-    useGetDomainStatusMutation();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async () => {
-    const response = await addDomain({ domainName: cloudflareDomain });
-
-    console.log(response.data);
-
-    if (response?.data?.success) {
-      // Show Toast
-      toast.success(response?.data?.message, {
-        position: "bottom-center",
+    setIsLoading(true);
+    try {
+      const response = await axios.post(`/cloudflare-add-domains`, {
+        domainName: cloudflareDomain,
       });
 
-      setCloudFlareNameServers(response?.data?.data?.result.name_servers);
-      setZoneId(response?.data?.data?.result.id);
-    } else {
-      // Show Toast
-      toast.error("Something went wrong", {
-        position: "bottom-center",
-      });
+      console.log(response.data);
+
+      if (response.data.success) {
+        toast.success(response.data.message, {
+          position: "bottom-center",
+        });
+
+        setCloudFlareNameServers(response.data.data.result.name_servers);
+        setZoneId(response.data.data.result.id);
+      } else {
+        toast.error("Something went wrong", {
+          position: "bottom-center",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        "Error: " + (error.response?.data?.message || "Something went wrong"),
+        {
+          position: "bottom-center",
+        }
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleNameServerOneCopy = () => {
-    console.log(cloudFlareNameServers[0]);
-    if (cloudFlareNameServers[0] === undefined) {
-      toast.error("No Name Server Found", {
-        position: "bottom-center",
-      });
-    } else {
+  const handleNameServerCopy = (index) => {
+    const nameServer = cloudFlareNameServers[index];
+    if (nameServer) {
+      navigator.clipboard.writeText(nameServer);
       toast.success("Copied", {
         position: "bottom-center",
       });
-
-      navigator.clipboard.writeText(cloudFlareNameServers[0]);
-    }
-  };
-
-  const handleNameServerTwoCopy = () => {
-    if (cloudFlareNameServers[1] === undefined) {
+    } else {
       toast.error("No Name Server Found", {
         position: "bottom-center",
       });
-    } else {
-      toast.success("Copied", {
-        position: "bottom-center",
-      });
-
-      navigator.clipboard.writeText(cloudFlareNameServers[1]);
     }
   };
 
   const getDomainStatusHandler = async () => {
-    const response = await getDomainStatus({ domainName: cloudflareDomain });
-
-    console.log(response.data);
-
-    if (response?.data?.success) {
-      toast.success("Domain is Active on Cloudflare", {
-        position: "bottom-center",
+    try {
+      const response = await axios.post(`/cloudflare-domain-status`, {
+        domainName: cloudflareDomain,
       });
-    } else {
-      toast.error("Domain Status is Inactive", {
-        position: "bottom-center",
-      });
+
+      console.log(response.data);
+
+      if (response.data.success) {
+        toast.success("Domain is Active on Cloudflare", {
+          position: "bottom-center",
+        });
+      } else {
+        toast.error("Domain Status is Inactive", {
+          position: "bottom-center",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        "Error: " + (error.response?.data?.message || "Something went wrong"),
+        {
+          position: "bottom-center",
+        }
+      );
     }
   };
 
@@ -113,8 +103,7 @@ const AddDomainToCloudflare = () => {
         <div className={styles.header}>
           <img src="./cloudflareIcon.svg" alt="logo" className={styles.logo} />
           <h3 className={styles.subHeading}>Adding Domain to CloudFlare</h3>
-          {addDomainLoading ||
-            (getDomainStatusLoading && <div className="spinner" />)}
+          {isLoading && <div className="spinner" />}
         </div>
 
         <div className={styles.domainFormContainer}>
@@ -138,52 +127,20 @@ const AddDomainToCloudflare = () => {
 
         <div className={styles.nameServerContainer}>
           <h4>Name Servers</h4>
-          <div className={styles.nameServerInputsContainer}>
-            <Input
-              value={
-                cloudFlareNameServers.length !== 0
-                  ? cloudFlareNameServers[0]
-                  : ""
-              }
-              className={styles.nameServerInputs}
-            />
-            <IoCopyOutline
-              size={20}
-              className={styles.copyIcon}
-              onClick={handleNameServerOneCopy}
-            />
-          </div>
-
-          <div className={styles.nameServerInputsContainer}>
-            <Input
-              value={
-                cloudFlareNameServers.length !== 0
-                  ? cloudFlareNameServers[1]
-                  : ""
-              }
-              className={styles.nameServerInputs}
-            />
-            <IoCopyOutline
-              size={20}
-              className={styles.copyIcon}
-              onClick={handleNameServerTwoCopy}
-            />
-          </div>
-
-          {/* <div className={styles.nameServerContainer}>
-            <h4>Domain ID</h4>
-            <div className={styles.nameServerInputsContainer}>
+          {cloudFlareNameServers.map((nameServer, index) => (
+            <div key={index} className={styles.nameServerInputsContainer}>
               <Input
-                defaultValue={zoneId}
+                value={nameServer}
                 className={styles.nameServerInputs}
+                readOnly
               />
               <IoCopyOutline
                 size={20}
                 className={styles.copyIcon}
-                onClick={handleNameServerTwoCopy}
+                onClick={() => handleNameServerCopy(index)}
               />
             </div>
-          </div> */}
+          ))}
 
           <div className={styles.checkDomainStatusBtnContainer}>
             <Button

@@ -4,9 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { toast } from "react-toastify";
 import styles from "./SgDomainAuth.module.css";
-import { useAddDomainInSgMutation } from "@/store/apiSlices/childApiSlices/sendgridApiSlice";
-import { useAddDNSRecordsMutation } from "@/store/apiSlices/childApiSlices/cloudflareApiSlice";
 import "../../spinner.css";
+import axios from "@/utils/axiosInstance";
 
 // Helper function to format DNS records
 const formatDnsRecords = (dns) => {
@@ -32,10 +31,7 @@ const formatDnsRecords = (dns) => {
 const SgDomainAuth = () => {
   const [domainName, setDomainName] = useState("");
   const [dnsRecords, setDnsRecords] = useState([]);
-  const [addDomainInSg, { isLoading: addDomainIsLoading }] =
-    useAddDomainInSgMutation();
-  const [addDnsRecord, { isLoading: addDnsIsLoading }] =
-    useAddDNSRecordsMutation();
+  const [isLoading, setIsLoading] = useState(false);
 
   // Handle domain input change
   const handleDomainChange = (event) => {
@@ -45,19 +41,24 @@ const SgDomainAuth = () => {
   // Handle domain authentication
   const addRecord = async () => {
     try {
-      const response = await addDomainInSg({ domainName });
+      setIsLoading(true);
+      const response = await axios.post("/sendgrid-add-domain", {
+        domainName,
+      });
 
       console.log(response?.data);
 
-      if (response.data.success) {
+      const { success, message, data } = response.data;
+
+      if (success) {
         toast.success(response.data.message, {
           position: "bottom-center",
         });
         // Extract DNS records and set them to state
-        const formattedRecords = formatDnsRecords(response.data.data.dns);
+        const formattedRecords = formatDnsRecords(data.dns);
         setDnsRecords(formattedRecords);
       } else {
-        toast.error(response.data.message, {
+        toast.error(message, {
           position: "bottom-center",
         });
       }
@@ -65,32 +66,40 @@ const SgDomainAuth = () => {
       toast.error("Error authenticating domain", {
         position: "bottom-center",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   // Function to add DNS records to Cloudflare
   const addRecordsToCloudflare = async () => {
     try {
+      setIsLoading(true);
+
       for (const record of dnsRecords) {
-        console.log(record);
-        const response = await addDnsRecord({ domainName, ...record }); // Adjust this line according to your API
-        if (response.data.success) {
+        const response = await axios.post("/cloudflare-add-dns-record", {
+          domainName,
+          ...record,
+        });
+
+        const { success, message } = response.data;
+
+        if (success) {
           toast.success(`Record ${record.name} added to Cloudflare!`, {
             position: "bottom-center",
           });
         } else {
-          toast.error(
-            `Failed to add record ${record.name}: ${response.data.message}`,
-            {
-              position: "bottom-center",
-            }
-          );
+          toast.error(`Failed to add record ${record.name}: ${message}`, {
+            position: "bottom-center",
+          });
         }
       }
     } catch (error) {
       toast.error("Error adding records to Cloudflare", {
         position: "bottom-center",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -99,7 +108,7 @@ const SgDomainAuth = () => {
       <div className={styles.header}>
         <img src="./sendgridIcon.svg" alt="logo" className={styles.logo} />
         <h2 className={styles.heading}>Authenticate Domain in SendGrid</h2>
-        {addDomainIsLoading || (addDnsIsLoading && <div className="spinner" />)}
+        {isLoading && <div className="spinner" />}
       </div>
 
       <div className={styles.inputContainer}>

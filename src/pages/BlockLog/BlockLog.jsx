@@ -14,8 +14,6 @@ import { Label } from "@/components/ui/label";
 // Utils
 
 // APISlices
-import { useGetAllDomainsQuery } from "@/store/apiSlices/childApiSlices/domainsApiSlice";
-import { useGetDomainEventsQuery } from "@/store/apiSlices/childApiSlices/eventsApiSlice";
 
 // Slice
 

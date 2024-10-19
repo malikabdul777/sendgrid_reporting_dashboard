@@ -1,3 +1,4 @@
+// src/components/AddDNSRecordsToCloudflare/AddDNSRecordsToCloudflare.js
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -14,12 +15,12 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { MdDeleteForever } from "react-icons/md";
 import { toast } from "react-toastify";
-import { useAddDNSRecordsMutation } from "@/store/apiSlices/childApiSlices/cloudflareApiSlice";
+import axiosInstance from "@/utils/axiosInstance";
 import styles from "./AddDNSRecordsToCloudflare.module.css";
 import "../../spinner.css";
 
 const AddDNSRecordsToCloudflare = () => {
-  const [domainName, setDomainName] = useState(""); // State for domain input
+  const [domainName, setDomainName] = useState("");
   const [records, setRecords] = useState([
     {
       type: "A",
@@ -83,6 +84,7 @@ const AddDNSRecordsToCloudflare = () => {
       initialName: "_dmarc.service.",
     },
   ]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const addRecord = () => {
     setRecords([
@@ -90,8 +92,6 @@ const AddDNSRecordsToCloudflare = () => {
       { type: "A", name: "", content: "", proxied: false },
     ]);
   };
-
-  const [addDNSRecords, { isLoading }] = useAddDNSRecordsMutation();
 
   const handleInputChange = (index, field, value) => {
     const updatedRecords = [...records];
@@ -110,7 +110,6 @@ const AddDNSRecordsToCloudflare = () => {
 
     const updatedRecords = records.map((record) => {
       if (record.type === "MX") {
-        // Only change the content for MX records, leave the name intact
         return {
           ...record,
           content: `email.${newDomainName}`,
@@ -119,17 +118,16 @@ const AddDNSRecordsToCloudflare = () => {
         return {
           ...record,
           name: `${record.initialName}${newDomainName}`,
-          content: `"v=DMARC1; p=none;"`, // Keep DMARC content
+          content: `"v=DMARC1; p=none;"`,
         };
       }
       return record;
     });
 
-    // Clear names for MX and TXT records if domain name is empty
     if (newDomainName === "") {
       const clearNameRecords = updatedRecords.map((record) => {
         if (record.type === "MX" || record.type === "TXT") {
-          return { ...record, name: "" }; // Clear name
+          return { ...record, name: "" };
         }
         return record;
       });
@@ -139,17 +137,29 @@ const AddDNSRecordsToCloudflare = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("DNS Records Submitted: ", records);
 
-    toast.success("DNS Records Added Successfully", {
-      position: "bottom-center",
-    });
-
-    records.map((record) => {
-      addDNSRecords({ domainName, ...record });
-    });
+    try {
+      setIsLoading(true);
+      for (const record of records) {
+        await axiosInstance.post("/cloudflare-add-dns-record", {
+          domainName,
+          ...record,
+        });
+      }
+      toast.success("DNS Records Added Successfully", {
+        position: "bottom-center",
+      });
+    } catch (error) {
+      console.error("Error adding DNS records:", error.response.data.message);
+      toast.error(error.response.data.message || "Error adding DNS records:", {
+        position: "bottom-center",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -158,7 +168,6 @@ const AddDNSRecordsToCloudflare = () => {
         <div className={styles.header}>
           <img src="./cloudflareIcon.svg" alt="logo" className={styles.logo} />
           <h2 className={styles.heading}>Add DNS Records To Cloudflare</h2>
-
           {isLoading && <div className="spinner" />}
         </div>
 
