@@ -8,6 +8,10 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "@radix-ui/react-icons": path.resolve(
+        __dirname,
+        "node_modules/@radix-ui/react-icons"
+      ), // Add this line
     },
   },
   build: {
