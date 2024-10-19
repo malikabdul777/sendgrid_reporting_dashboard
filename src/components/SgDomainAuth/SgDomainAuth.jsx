@@ -103,6 +103,31 @@ const SgDomainAuth = () => {
     }
   };
 
+  const validateAuthenticatedSGDomain = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.post("/sendgrid-validate-domain", {
+        domainName,
+      });
+      //   console.log(response.data.data);
+      if (response.data?.data.valid) {
+        toast.success("Domain validated successfully", {
+          position: "bottom-center",
+        });
+      } else {
+        toast.error("Domain not validated yet, Try again after some time", {
+          position: "bottom-center",
+        });
+      }
+    } catch (error) {
+      toast.error("Error validating authenticated domain", {
+        position: "bottom-center",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.header}>
@@ -163,13 +188,22 @@ const SgDomainAuth = () => {
               />
             </div>
           ))}
-          <Button
-            type="button"
-            onClick={addRecordsToCloudflare}
-            className={styles.addButton}
-          >
-            Add Records to Cloudflare
-          </Button>
+          <div className={styles.buttonContainer}>
+            <Button
+              type="button"
+              onClick={addRecordsToCloudflare}
+              className={styles.addButton}
+            >
+              1. Add Records to Cloudflare
+            </Button>
+            <Button
+              type="button"
+              onClick={validateAuthenticatedSGDomain}
+              className={styles.addButton}
+            >
+              2. Validate Domain in Sendgrid
+            </Button>
+          </div>
         </div>
       )}
     </div>
