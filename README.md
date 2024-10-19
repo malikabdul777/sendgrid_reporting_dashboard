@@ -1,1 +1,1 @@
-# Expense Buddy
+# SendGrid Reporting Dashboard
