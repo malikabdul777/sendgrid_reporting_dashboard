@@ -21,10 +21,10 @@ function App() {
         <Routes>
           {/* Private Routes */}
           <Route path="/" element={<Layout />}>
+            <Route path="domain-auth" element={<DomainAuth />} />
             <Route path="block_log" element={<BlockLog />} />
             <Route path="domain-logs" element={<DomainLogs />} />
             <Route path="spam-reporters" element={<Reporters />} />
-            <Route path="domain-auth" element={<DomainAuth />} />
 
             {/* Fallback Route */}
             <Route path="*" element={<Navigate to="/block_log" />} />
