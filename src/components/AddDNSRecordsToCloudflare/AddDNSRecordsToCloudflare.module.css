@@ -1,0 +1,37 @@
+.wrapper {
+  border: 1px solid var(--lightGrey);
+  width: 60%;
+  padding: 30px 40px;
+  border-radius: 20px;
+  margin-bottom: 50px;
+}
+
+.heading {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.headerContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+.header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.logo {
+  height: 45px;
+  object-fit: contain;
+}
+.deleteButtonContainer {
+  border: 1px solid var(--lightGrey);
+  border-radius: 7px;
+  padding: 7px;
+  cursor: pointer;
+}
+.priorityInput {
+  width: 110px !important;
+}

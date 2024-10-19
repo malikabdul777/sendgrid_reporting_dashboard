@@ -1,0 +1,42 @@
+.wrapper {
+  border: 1px solid var(--lightGrey);
+  width: 60%;
+  padding: 30px 40px;
+  border-radius: 20px;
+  margin-bottom: 50px;
+}
+.heading {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.inputContainer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-block: 20px;
+}
+.input {
+  width: 100%;
+}
+.authButton {
+  margin-top: 20px;
+}
+.subHeading {
+  font-size: 16px;
+  font-weight: bold;
+  margin-block: 70px 15px;
+}
+.addButton {
+  margin-top: 20px;
+}
+.logo {
+  height: 30px;
+  object-fit: contain;
+  margin-block: 20px;
+}
+.header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}

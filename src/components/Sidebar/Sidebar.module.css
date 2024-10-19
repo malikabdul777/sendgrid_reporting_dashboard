@@ -1,0 +1,67 @@
+.container {
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  height: 100vh;
+  width: 200px;
+  border-right: 2px solid var(--lightGrey);
+}
+.logo {
+  height: 50px;
+  object-fit: contain;
+  margin-top: 40px;
+}
+.menu {
+  margin-top: 50px;
+  padding-inline: 50px;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.navLink {
+  text-decoration: none;
+  margin-block: 12px;
+  width: 145px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  padding-left: 15px;
+  border-radius: 10px;
+  color: var(--darkGrey);
+}
+.item {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  text-decoration: none;
+  width: 100%;
+}
+.navLinkText {
+  margin-left: 10px;
+  text-decoration: none;
+}
+.activeNavLink {
+  color: var(--black);
+  background-color: var(--accentColorLight);
+  font-weight: 500;
+}
+.activeIcon {
+  color: var(--accentColor);
+}
+.toolsContainer {
+  width: 100%;
+  padding-inline: 30px;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  justify-content: flex-start;
+  margin-top: 50px;
+}
+.toolsHeading {
+  font-size: 18px;
+  color: var(--darkGrey);
+  font-size: 16px;
+}
