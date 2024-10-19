@@ -16,12 +16,7 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      external: [
-        "@reduxjs/toolkit",
-        "redux-persist",
-        "redux",
-        "@radix-ui/react-icons",
-      ],
+      external: ["@reduxjs/toolkit", "redux-persist", "redux"],
     },
   },
 });
