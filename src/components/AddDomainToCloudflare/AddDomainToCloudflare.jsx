@@ -24,7 +24,7 @@ import "../../spinner.css";
 const AddDomainToCloudflare = () => {
   const [cloudflareDomain, setCloudflareDomain] = useState("");
   const [cloudFlareNameServers, setCloudFlareNameServers] = useState([]);
-  const [zoneId, setZoneId] = useState("");
+  //   const [zoneId, setZoneId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const [addNewDomain, setAddNewDomain] = useState("");
@@ -45,7 +45,7 @@ const AddDomainToCloudflare = () => {
         });
 
         setCloudFlareNameServers(response.data.data.result.name_servers);
-        setZoneId(response.data.data.result.id);
+        // setZoneId(response.data.data.result.id);
       } else {
         toast.error("Something went wrong", {
           position: "bottom-center",
@@ -155,7 +155,7 @@ const AddDomainToCloudflare = () => {
             <Input
               id="domain"
               value={cloudflareDomain}
-              onChange={(e) => setCloudflareDomain(e.target.value)}
+              onChange={(e) => setCloudflareDomain(e.target.value.trim())}
             />
           </div>
 

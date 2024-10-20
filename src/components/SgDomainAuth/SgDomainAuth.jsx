@@ -35,7 +35,7 @@ const SgDomainAuth = () => {
 
   // Handle domain input change
   const handleDomainChange = (event) => {
-    setDomainName(event.target.value);
+    setDomainName(event.target.value.trim());
   };
 
   // Handle domain authentication

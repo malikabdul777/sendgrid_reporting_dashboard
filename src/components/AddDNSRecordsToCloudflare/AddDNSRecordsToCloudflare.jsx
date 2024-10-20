@@ -105,7 +105,7 @@ const AddDNSRecordsToCloudflare = () => {
   };
 
   const handleDomainChange = (e) => {
-    const newDomainName = e.target.value;
+    const newDomainName = e.target.value.trim();
     setDomainName(newDomainName);
 
     const updatedRecords = records.map((record) => {
