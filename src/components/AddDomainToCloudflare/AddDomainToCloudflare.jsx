@@ -7,6 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { IoCopyOutline } from "react-icons/io5";
 import { toast } from "react-toastify";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
 
 // Utils
 import axios from "@/utils/axiosInstance"; // Import the Axios instance
@@ -20,6 +26,9 @@ const AddDomainToCloudflare = () => {
   const [cloudFlareNameServers, setCloudFlareNameServers] = useState([]);
   const [zoneId, setZoneId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const [addNewDomain, setAddNewDomain] = useState("");
+  const [addNewZoneId, setAddNewZoneId] = useState("");
 
   const handleSubmit = async () => {
     setIsLoading(true);
@@ -97,6 +106,27 @@ const AddDomainToCloudflare = () => {
     }
   };
 
+  // Handler for associating new domain and ZoneID
+  const handleAddZoneId = async () => {
+    setIsLoading(true);
+
+    try {
+      // Trim the input values
+      const trimmedDomain = addNewDomain.trim();
+      const trimmedZoneId = addNewZoneId.trim();
+
+      // API call to the backend
+      const response = await axios.post("/cloudflare-add-zone-id", {
+        domainName: trimmedDomain,
+        zoneId: trimmedZoneId,
+      });
+      console.log("success", response.data);
+    } catch (error) {
+      console.log("error", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <div className={styles.wrapper}>
       <div>
@@ -152,6 +182,48 @@ const AddDomainToCloudflare = () => {
           </div>
         </div>
       </div>
+
+      <Accordion type="single" collapsible className="w-full mt-4">
+        <AccordionItem value="addZoneId">
+          <AccordionTrigger>Add Cloudflare Zone ID</AccordionTrigger>
+          <AccordionContent>
+            <div className="flex flex-col gap-4">
+              {/* Domain Input */}
+              <div className="mt-4 px-3">
+                <Label htmlFor="domain">Domain Name:</Label>
+                <Input
+                  id="domain"
+                  type="text"
+                  placeholder="Enter domain name"
+                  value={addNewDomain}
+                  onChange={(e) => setAddNewDomain(e.target.value)}
+                />
+              </div>
+
+              {/* Zone ID Input */}
+              <div className="px-3">
+                <Label htmlFor="zoneId">Zone ID:</Label>
+                <Input
+                  id="zoneId"
+                  type="text"
+                  placeholder="Enter zone ID"
+                  value={addNewZoneId}
+                  onChange={(e) => setAddNewZoneId(e.target.value)}
+                />
+              </div>
+
+              {/* Submit Button */}
+              <Button
+                onClick={handleAddZoneId}
+                disabled={!addNewDomain || !addNewZoneId}
+                className={styles.associateDomainBtn}
+              >
+                Add Zone ID
+              </Button>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </div>
   );
 };

@@ -80,3 +80,8 @@
 .checkDomainStatusBtnContainer {
   margin-top: 30px;
 }
+.associateDomainBtn {
+  width: 200px;
+  margin-left: 15px;
+  margin-top: 10px;
+}
