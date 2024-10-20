@@ -120,9 +120,22 @@ const AddDomainToCloudflare = () => {
         domainName: trimmedDomain,
         zoneId: trimmedZoneId,
       });
-      console.log("success", response.data);
+      //   console.log("success", response.data);
+
+      if (response.data.success) {
+        toast.success(response.data.message, {
+          position: "bottom-center",
+        });
+      } else {
+        toast.error(response.data.message, {
+          position: "bottom-center",
+        });
+      }
     } catch (error) {
-      console.log("error", error);
+      //   console.log("error", error);
+      toast.error(response.data.message || "Something went wrong", {
+        position: "bottom-center",
+      });
     } finally {
       setIsLoading(false);
     }
