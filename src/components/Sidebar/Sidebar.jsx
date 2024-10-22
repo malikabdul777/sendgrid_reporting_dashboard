@@ -114,6 +114,26 @@ const Sidebar = () => {
               <p className={styles.navLinkText}>Reporters</p>
             </div>
           </NavLink>
+
+          <NavLink
+            to="webform-blocks-check"
+            className={`${styles.navLink} ${
+              pathname === "/webform-blocks-check" ? styles.activeNavLink : null
+            }`}
+            title={"Spam Reporters"}
+          >
+            <div className={styles.item}>
+              <BsDatabase
+                size={20}
+                className={`${
+                  pathname === "/webform-blocks-check"
+                    ? styles.activeIcon
+                    : null
+                }`}
+              />
+              <p className={styles.navLinkText}>WF Blocks</p>
+            </div>
+          </NavLink>
         </div>
       </div>
     </div>

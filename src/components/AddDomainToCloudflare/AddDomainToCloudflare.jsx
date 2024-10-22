@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/accordion";
 
 // Utils
-import axios from "@/utils/axiosInstance"; // Import the Axios instance
+import axios from "@/utils/axiosInstance";
 
 // Styles
 import styles from "./AddDomainToCloudflare.module.css";

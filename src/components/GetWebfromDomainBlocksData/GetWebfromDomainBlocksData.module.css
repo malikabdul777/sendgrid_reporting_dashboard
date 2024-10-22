@@ -1,0 +1,21 @@
+.wrapper {
+  border: 1px solid var(--lightGrey);
+  width: 50%;
+  padding: 30px 40px;
+  border-radius: 20px;
+  margin-bottom: 50px;
+  margin-block: 40px 60px;
+}
+.tableContainer {
+  border: 1px solid var(--lightGrey);
+  width: 100%;
+  padding: 10px 20px;
+  border-radius: 10px;
+  margin-bottom: 50px;
+  margin-block: 40px 60px;
+}
+.buttonContainer {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}

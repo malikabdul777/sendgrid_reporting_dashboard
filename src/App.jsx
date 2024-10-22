@@ -13,6 +13,8 @@ import DomainLogs from "./pages/DomainLogs/DomainLogs";
 import Reporters from "./pages/Reporters/Reporters";
 import BlockLog from "./pages/BlockLog/BlockLog";
 import DomainAuth from "./pages/DomainAuth/DomainAuth";
+import AddWebformDomainDetails from "./components/AddWebformDomainDetails/AddWebformDomainDetails";
+import WebformBlocks from "./pages/WebformBlocks/WebformBlocks";
 
 function App() {
   return (
@@ -25,6 +27,7 @@ function App() {
             <Route path="block_log" element={<BlockLog />} />
             <Route path="domain-logs" element={<DomainLogs />} />
             <Route path="spam-reporters" element={<Reporters />} />
+            <Route path="webform-blocks-check" element={<WebformBlocks />} />
 
             {/* Fallback Route */}
             <Route path="*" element={<Navigate to="/domain-auth" />} />
