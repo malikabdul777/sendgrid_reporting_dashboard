@@ -56,7 +56,7 @@ const AddWebformDomainDetails = () => {
     <div className={styles.wrapper}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className={styles.formGroup}>
-          <div>
+          <div className={styles.inputGroup}>
             <label className="block text-sm font-medium mb-2">Webform ID</label>
             <Input
               {...register("webformId", { required: true })}
@@ -65,7 +65,7 @@ const AddWebformDomainDetails = () => {
             />
           </div>
 
-          <div>
+          <div className={styles.inputGroup}>
             <label className="block text-sm font-medium mb-2">Data Name</label>
             <Input
               {...register("dataName", { required: true })}
@@ -75,7 +75,7 @@ const AddWebformDomainDetails = () => {
           </div>
         </div>
 
-        <div>
+        <div className={styles.inputGroup}>
           <label className="block text-sm font-medium mb-2">Domains List</label>
           <Textarea
             {...register("domainsList", { required: true })}

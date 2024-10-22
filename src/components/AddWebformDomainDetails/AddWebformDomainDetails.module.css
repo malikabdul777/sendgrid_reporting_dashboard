@@ -9,11 +9,14 @@
   display: flex;
   gap: 30px;
 }
+.inputGroup {
+  width: 100%;
+}
 .input {
-  width: 300px !important;
+  width: 100% !important;
 }
 .textAreaInput {
-  width: 630px !important;
+  width: 100% !important;
 }
 .datePicker {
   width: 300px !important;
