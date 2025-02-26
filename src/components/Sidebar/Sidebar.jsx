@@ -7,6 +7,7 @@ import { FaListUl } from "react-icons/fa";
 import { BsDatabase } from "react-icons/bs";
 import { useLocation } from "react-router-dom";
 import { GoShieldLock } from "react-icons/go";
+import { FiEdit } from "react-icons/fi";
 
 // Utils
 
@@ -62,20 +63,20 @@ const Sidebar = () => {
             </div>
           </NavLink>
           <NavLink
-            to="block_log"
-            title={"Block Log"}
+            to="template_builder"
+            title={"Template Builder"}
             className={`${styles.navLink} ${
-              pathname === "/block_log" ? styles.activeNavLink : null
+              pathname === "/template_builder" ? styles.activeNavLink : null
             }`}
           >
             <div className={styles.item}>
-              <GoHomeFill
+              <FiEdit
                 size={20}
                 className={`${
-                  pathname === "/block_log" ? styles.activeIcon : null
+                  pathname === "/template_builder" ? styles.activeIcon : null
                 }`}
               />
-              <p className={styles.navLinkText}>Block Log</p>
+              <p className={styles.navLinkText}>Template Bui</p>
             </div>
           </NavLink>
 

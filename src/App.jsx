@@ -15,6 +15,7 @@ import BlockLog from "./pages/BlockLog/BlockLog";
 import DomainAuth from "./pages/DomainAuth/DomainAuth";
 import AddWebformDomainDetails from "./components/AddWebformDomainDetails/AddWebformDomainDetails";
 import WebformBlocks from "./pages/WebformBlocks/WebformBlocks";
+import TemplateBuilder from "./pages/TemplateBuilder/TemplateBuilder";
 
 function App() {
   return (
@@ -24,7 +25,7 @@ function App() {
           {/* Private Routes */}
           <Route path="/" element={<Layout />}>
             <Route path="domain-auth" element={<DomainAuth />} />
-            <Route path="block_log" element={<BlockLog />} />
+            <Route path="template_builder" element={<TemplateBuilder />} />
             <Route path="domain-logs" element={<DomainLogs />} />
             <Route path="spam-reporters" element={<Reporters />} />
             <Route path="webform-blocks-check" element={<WebformBlocks />} />
