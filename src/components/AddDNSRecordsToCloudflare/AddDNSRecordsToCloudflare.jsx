@@ -24,34 +24,34 @@ const AddDNSRecordsToCloudflare = () => {
   const [records, setRecords] = useState([
     {
       type: "A",
-      name: "",
+      name: `${domainName}`,
       content: "144.126.137.229",
       proxied: true,
     },
     { type: "A", name: "www", content: "144.126.137.229", proxied: true },
     { type: "A", name: "e", content: "144.126.137.229", proxied: true },
     { type: "A", name: "safelinks", content: "144.126.137.229", proxied: true },
-    { type: "A", name: "email", content: "15.204.199.95", proxied: false },
+    { type: "A", name: "email", content: "144.126.137.229", proxied: false },
     {
       type: "MX",
       name: `${domainName}`,
       content: `email.${domainName}`,
       priority: 10,
     },
-    { type: "MX", name: "info", content: `email.${domainName}`, priority: 10 },
-    { type: "MX", name: "m", content: `email.${domainName}`, priority: 10 },
-    {
-      type: "MX",
-      name: "update",
-      content: `email.${domainName}`,
-      priority: 10,
-    },
-    {
-      type: "MX",
-      name: "service",
-      content: `email.${domainName}`,
-      priority: 10,
-    },
+    // { type: "MX", name: "info", content: `email.${domainName}`, priority: 10 },
+    // { type: "MX", name: "m", content: `email.${domainName}`, priority: 10 },
+    // {
+    //   type: "MX",
+    //   name: "update",
+    //   content: `email.${domainName}`,
+    //   priority: 10,
+    // },
+    // {
+    //   type: "MX",
+    //   name: "service",
+    //   content: `email.${domainName}`,
+    //   priority: 10,
+    // },
     // Add new TXT records
     {
       type: "TXT",
@@ -59,30 +59,30 @@ const AddDNSRecordsToCloudflare = () => {
       content: `"v=DMARC1; p=none;"`,
       initialName: "_dmarc.",
     },
-    {
-      type: "TXT",
-      name: `_dmarc.info${domainName}`,
-      content: `"v=DMARC1; p=none;"`,
-      initialName: "_dmarc.info.",
-    },
-    {
-      type: "TXT",
-      name: `_dmarc.m${domainName}`,
-      content: `"v=DMARC1; p=none;"`,
-      initialName: "_dmarc.m.",
-    },
-    {
-      type: "TXT",
-      name: `_dmarc.update${domainName}`,
-      content: `"v=DMARC1; p=none;"`,
-      initialName: "_dmarc.update.",
-    },
-    {
-      type: "TXT",
-      name: `_dmarc.service${domainName}`,
-      content: `"v=DMARC1; p=none;"`,
-      initialName: "_dmarc.service.",
-    },
+    // {
+    //   type: "TXT",
+    //   name: `_dmarc.info${domainName}`,
+    //   content: `"v=DMARC1; p=none;"`,
+    //   initialName: "_dmarc.info.",
+    // },
+    // {
+    //   type: "TXT",
+    //   name: `_dmarc.m${domainName}`,
+    //   content: `"v=DMARC1; p=none;"`,
+    //   initialName: "_dmarc.m.",
+    // },
+    // {
+    //   type: "TXT",
+    //   name: `_dmarc.update${domainName}`,
+    //   content: `"v=DMARC1; p=none;"`,
+    //   initialName: "_dmarc.update.",
+    // },
+    // {
+    //   type: "TXT",
+    //   name: `_dmarc.service${domainName}`,
+    //   content: `"v=DMARC1; p=none;"`,
+    //   initialName: "_dmarc.service.",
+    // },
   ]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -112,6 +112,7 @@ const AddDNSRecordsToCloudflare = () => {
       if (record.type === "MX") {
         return {
           ...record,
+          name: record.name === domainName ? newDomainName : record.name,
           content: `email.${newDomainName}`,
         };
       } else if (record.type === "TXT" && record.name.includes("_dmarc")) {
@@ -119,6 +120,12 @@ const AddDNSRecordsToCloudflare = () => {
           ...record,
           name: `${record.initialName}${newDomainName}`,
           content: `"v=DMARC1; p=none;"`,
+        };
+      } else if (record.name === domainName) {
+        // Update any other record types where name matches the domain
+        return {
+          ...record,
+          name: newDomainName,
         };
       }
       return record;
