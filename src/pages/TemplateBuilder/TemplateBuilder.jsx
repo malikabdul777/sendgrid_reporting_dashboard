@@ -8,6 +8,7 @@ import { MdDeleteForever } from "react-icons/md";
 import { IoAddOutline } from "react-icons/io5";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import he from "he";
 
 import styles from "./TemplateBuilder.module.css";
 
@@ -120,9 +121,45 @@ const EmailHeadersForm = () => {
     });
   };
 
-  // Identify and remove special characters (HSP, ZWSP, etc.)
+  const getHtmlEntitySuggestion = (char) => {
+    // Common named entities mapping
+    const commonEntities = {
+      "©": "&copy;",
+      "®": "&reg;",
+      "™": "&trade;",
+      "€": "&euro;",
+      "£": "&pound;",
+      "¥": "&yen;",
+      "°": "&deg;",
+      "±": "&plusmn;",
+      "¼": "&frac14;",
+      "½": "&frac12;",
+      "¾": "&frac34;",
+      "×": "&times;",
+      "÷": "&divide;",
+      "•": "&bull;",
+      "…": "&hellip;",
+      "′": "&prime;",
+      "″": "&Prime;",
+      "«": "&laquo;",
+      "»": "&raquo;",
+      "¶": "&para;",
+      "§": "&sect;",
+      "†": "&dagger;",
+      "‡": "&Dagger;",
+      "‰": "&permil;",
+    };
+
+    // Return named entity if available
+    if (commonEntities[char]) {
+      return commonEntities[char];
+    }
+
+    // For other characters, return numeric entity
+    return `&#${char.codePointAt(0)};`;
+  };
+
   const handleIdentifySpecialCharacters = () => {
-    // Define special characters and their names
     const specialCharacters = [
       { char: "\u200A", name: "Hair Space (HSP)" },
       { char: "\u200B", name: "Zero Width Space (ZWSP)" },
@@ -152,56 +189,58 @@ const EmailHeadersForm = () => {
       }
     });
 
-    // Check for emojis and other special characters
-    const checkForSpecialChars = (text) => {
-      for (let i = 0; i < text.length; i++) {
-        const char = text[i];
-        const code = text.codePointAt(i);
+    // Improved check for emojis and other special characters
+    for (let i = 0; i < updatedTemplate.length; i++) {
+      const code = updatedTemplate.codePointAt(i);
 
-        // Skip already identified characters
-        if (specialCharacters.some((sc) => sc.char === char)) {
-          continue;
-        }
+      // Skip if not a special character
+      if (code <= 127) continue;
 
-        // Check for emojis (Unicode ranges)
-        if (
-          (code >= 0x1f300 && code <= 0x1f9ff) || // Miscellaneous Symbols and Pictographs
-          (code >= 0x2600 && code <= 0x26ff) || // Miscellaneous Symbols
-          (code >= 0x2700 && code <= 0x27bf) || // Dingbats
-          (code >= 0xfe00 && code <= 0xfe0f) || // Variation Selectors
-          (code >= 0x1f000 && code <= 0x1f9ff) // Supplemental Symbols and Pictographs
-        ) {
-          foundCharacters.push({
-            char: char,
-            name: `Emoji/Symbol (U+${code.toString(16).toUpperCase()})`,
-          });
-          continue;
-        }
+      // Get the actual character (handles surrogate pairs for emojis)
+      const char = String.fromCodePoint(code);
 
-        // Check for other 8-bit characters (above ASCII 127)
-        if (code > 127) {
-          foundCharacters.push({
-            char: char,
-            name: `8-bit Character (U+${code.toString(16).toUpperCase()})`,
-          });
-        }
+      // Skip if already found
+      if (foundCharacters.some((found) => found.char === char)) continue;
+
+      // Check for emojis
+      if (
+        (code >= 0x1f300 && code <= 0x1f9ff) || // Miscellaneous Symbols and Pictographs
+        (code >= 0x2600 && code <= 0x26ff) || // Miscellaneous Symbols
+        (code >= 0x2700 && code <= 0x27bf) || // Dingbats
+        (code >= 0xfe00 && code <= 0xfe0f) || // Variation Selectors
+        (code >= 0x1f000 && code <= 0x1f9ff) // Supplemental Symbols and Pictographs
+      ) {
+        foundCharacters.push({
+          char,
+          name: `Emoji/Symbol (U+${code.toString(16).toUpperCase()})`,
+        });
+      } else if (code > 127) {
+        foundCharacters.push({
+          char,
+          name: `8-bit Character (U+${code.toString(16).toUpperCase()})`,
+        });
       }
-    };
 
-    checkForSpecialChars(updatedTemplate);
+      // Skip the low surrogate if this was a surrogate pair
+      if (code > 0xffff) {
+        i++;
+      }
+    }
 
     if (foundCharacters.length > 0) {
-      // Sort found characters by their Unicode code point
       foundCharacters.sort(
         (a, b) => a.char.codePointAt(0) - b.char.codePointAt(0)
       );
 
+      // Initialize replacement suggestions
+      const initialReplacements = {};
+      foundCharacters.forEach(({ char }) => {
+        initialReplacements[char] = getHtmlEntitySuggestion(char);
+      });
+
+      setReplacementChars(initialReplacements);
       setFoundSpecialCharacters(foundCharacters);
       setShowRemovedCharactersModal(true);
-
-      // Optional: Add a button in the modal to remove these characters
-      const cleanTemplate = updatedTemplate.replace(/[\u0080-\uFFFF]/g, "");
-      setCombinedTemplate(cleanTemplate);
     } else {
       toast.info("No special characters found.", {
         position: "bottom-center",
@@ -369,7 +408,16 @@ const EmailHeadersForm = () => {
             <ul className={styles.modalList}>
               {foundSpecialCharacters.map(({ char, name }, index) => (
                 <li key={index} className={styles.modalListItem}>
-                  <span className={styles.modalChar}>{char}</span>
+                  <span className={styles.modalChar}>
+                    <span
+                      style={{
+                        fontFamily:
+                          '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                      }}
+                    >
+                      {char}
+                    </span>
+                  </span>
                   <span className={styles.modalName}>{name}</span>
                   <span className={styles.modalCode}>
                     U+
@@ -379,17 +427,33 @@ const EmailHeadersForm = () => {
                       .toUpperCase()
                       .padStart(4, "0")}
                   </span>
-                  <Input
-                    className={styles.modalInput}
-                    value={replacementChars[char] || ""}
-                    onChange={(e) =>
-                      setReplacementChars((prev) => ({
-                        ...prev,
-                        [char]: e.target.value,
-                      }))
-                    }
-                    placeholder="Replace with..."
-                  />
+                  <div className="flex flex-col gap-1">
+                    <Input
+                      className={styles.modalInput}
+                      value={replacementChars[char] || ""}
+                      onChange={(e) =>
+                        setReplacementChars((prev) => ({
+                          ...prev,
+                          [char]: e.target.value,
+                        }))
+                      }
+                      placeholder="Replace with..."
+                    />
+                    {replacementChars[char] && (
+                      <div className="text-xs text-gray-500">
+                        Preview:{" "}
+                        {replacementChars[char].startsWith("&") ? (
+                          <span
+                            dangerouslySetInnerHTML={{
+                              __html: replacementChars[char],
+                            }}
+                          />
+                        ) : (
+                          replacementChars[char]
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </li>
               ))}
             </ul>
