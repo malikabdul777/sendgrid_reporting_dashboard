@@ -122,6 +122,20 @@ const EmailHeadersForm = () => {
   };
 
   const getHtmlEntitySuggestion = (char) => {
+    // Characters that should have empty suggestions
+    const emptyReplacementChars = [
+      "\u200A", // Hair Space (HSP)
+      "\u200B", // Zero Width Space (ZWSP)
+      "\u200C", // Zero Width Non-Joiner
+      "\u200D", // Zero Width Joiner
+      "\uFEFF", // Zero Width No-Break Space
+    ];
+
+    // Return empty string for specified characters
+    if (emptyReplacementChars.includes(char)) {
+      return "";
+    }
+
     // Common named entities mapping
     const commonEntities = {
       "©": "&copy;",
