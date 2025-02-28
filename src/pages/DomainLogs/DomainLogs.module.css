@@ -1,0 +1,14 @@
+/* Remove container and wrapper styles as we're using direct Tailwind classes now */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.subHeading {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}

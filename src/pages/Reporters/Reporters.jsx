@@ -125,7 +125,7 @@ const Reporters = () => {
             <div className="flex items-center gap-2">
               <h3 className={styles.subHeading}>Spam Reports</h3>
               {isFetching && (
-                <ImSpinner8 className="animate-spin text-blue-500" size={20} />
+                <ImSpinner8 className="animate-spin text-black" size={20} />
               )}
             </div>
           </div>
@@ -184,9 +184,10 @@ const Reporters = () => {
               Cancel
             </Button>
             <Button
-              variant="destructive"
+              variant="ghost"
               onClick={handleDelete}
               disabled={isDeleting}
+              className="text-red-500 hover:text-red-600 hover:bg-red-50"
             >
               {isDeleting ? "Clearing..." : "Clear All"}
             </Button>
