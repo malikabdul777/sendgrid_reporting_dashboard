@@ -1,0 +1,39 @@
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0;
+  padding: 2rem;
+}
+
+.wrapper {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid var(--lightGrey);
+  /* box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); */
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.subHeading {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.button {
+  min-width: 100px;
+}
+
+.textarea {
+  min-height: 400px !important;
+  resize: vertical;
+  width: 100%;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
