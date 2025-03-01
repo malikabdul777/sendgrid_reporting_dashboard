@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { ImSpinner8 } from "react-icons/im";
 import { IoAdd } from "react-icons/io5";
 import { IoRemove } from "react-icons/io5";
+import { IoRefreshOutline } from "react-icons/io5";
 import {
   BarChart,
   Bar,
@@ -40,6 +41,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Label } from "@/components/ui/label";
 
 // Constants
 
@@ -63,6 +65,9 @@ const DomainLogs = () => {
 
   const handleSendgridChange = async (value) => {
     setSelectedSG(value);
+    // Clear existing data immediately when new request starts
+    setDomainsData([]);
+
     try {
       setIsFetching(true);
       const response = await axios.get(`/sg-reports/${value}`);
@@ -90,12 +95,22 @@ const DomainLogs = () => {
       }
     } catch (error) {
       console.error("Error fetching Sendgrid reports:", error);
-      toast.error("Account not found,Failed to fetch reports", {
+      toast.error("Failed to fetch Sendgrid reports", {
         position: "bottom-center",
       });
     } finally {
       setIsFetching(false);
     }
+  };
+
+  const handleRefresh = async () => {
+    if (!selectedSG) {
+      toast.error("Please select a Sendgrid account first", {
+        position: "bottom-center",
+      });
+      return;
+    }
+    await handleSendgridChange(selectedSG);
   };
 
   const barColors = {
@@ -131,7 +146,7 @@ const DomainLogs = () => {
     <div className="h-screen overflow-y-auto p-6">
       <div className="max-w-[1200px]">
         <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <h3 className="text-xl font-semibold">Sendgrid Reports</h3>
@@ -151,17 +166,39 @@ const DomainLogs = () => {
               </div>
             </div>
 
-            <div className="w-[200px]">
-              <Select onValueChange={handleSendgridChange} value={selectedSG}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Sendgrid" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="2">Sendgrid 2</SelectItem>
-                  <SelectItem value="3">Sendgrid 3</SelectItem>
-                  <SelectItem value="4">Sendgrid 4</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="space-y-2">
+              <Label htmlFor="sendgrid-select" className="text-gray-500">
+                Select Sendgrid account
+              </Label>
+              <div className="flex items-center justify-between">
+                <div className="w-[200px]">
+                  <Select
+                    onValueChange={handleSendgridChange}
+                    value={selectedSG}
+                    id="sendgrid-select"
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Sendgrid" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="2">Sendgrid 2</SelectItem>
+                      <SelectItem value="3">Sendgrid 3</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <button
+                  onClick={handleRefresh}
+                  disabled={isFetching || !selectedSG}
+                  className="p-2 hover:bg-gray-100 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Refresh data"
+                >
+                  <IoRefreshOutline
+                    className={`w-5 h-5 text-gray-600 ${
+                      isFetching ? "animate-spin" : ""
+                    }`}
+                  />
+                </button>
+              </div>
             </div>
 
             {domainsData.length > 0 && (
