@@ -5,9 +5,35 @@
   border-radius: 20px;
   margin-bottom: 50px;
 }
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.leftSection {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+}
+
 .heading {
-  font-size: 22px;
-  font-weight: bold;
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .inputContainer {
@@ -16,33 +42,28 @@
   justify-content: flex-start;
   margin-block: 20px;
 }
+
 .input {
   width: 100%;
 }
+
 .authButton {
   margin-top: 20px;
 }
+
 .subHeading {
   font-size: 16px;
   font-weight: bold;
   margin-block: 70px 15px;
 }
+
 .addButton {
   margin-top: 20px;
 }
-.logo {
-  height: 30px;
-  object-fit: contain;
-  margin-block: 20px;
-}
-.header {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
+
 .buttonContainer {
   display: flex;
-  flex-direction: column;
+  /* flex-direction: column; */
   align-items: flex-start;
   gap: 10px;
 }
