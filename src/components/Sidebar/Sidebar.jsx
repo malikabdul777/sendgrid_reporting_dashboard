@@ -116,7 +116,7 @@ const Sidebar = () => {
             </div>
           </NavLink>
 
-          <NavLink
+          {/* <NavLink
             to="webform-blocks-check"
             className={`${styles.navLink} ${
               pathname === "/webform-blocks-check" ? styles.activeNavLink : null
@@ -134,7 +134,7 @@ const Sidebar = () => {
               />
               <p className={styles.navLinkText}>WF Blocks</p>
             </div>
-          </NavLink>
+          </NavLink> */}
         </div>
       </div>
     </div>

@@ -134,7 +134,7 @@ const Reporters = () => {
               value={spamEmails}
               onChange={(e) => setSpamEmails(e.target.value)}
               placeholder="Spam email addresses will appear here..."
-              className={`${styles.textarea} font-mono`}
+              className={`${styles.textarea} p-6`}
             />
             {spamEmails && (
               <button
@@ -152,13 +152,13 @@ const Reporters = () => {
               disabled={isFetching || isDeleting}
               className={styles.button}
             >
-              {isFetching ? "Fetching..." : "Fetch Emails"}
+              {isFetching ? "Fetching..." : "Fetch Reporters"}
             </Button>
             <Button
-              variant="destructive"
+              variant="ghost"
               onClick={handleClearConfirm}
               disabled={!spamEmails || isDeleting}
-              className={styles.button}
+              className={`${styles.button} text-red-500 hover:text-red-600 hover:bg-red-50`}
             >
               {isDeleting ? "Clearing..." : "Clear"}
             </Button>
