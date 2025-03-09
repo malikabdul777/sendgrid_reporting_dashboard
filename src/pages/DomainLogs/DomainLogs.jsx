@@ -4,8 +4,6 @@ import { useState } from "react";
 // Thirdparty
 import { toast } from "react-toastify";
 import { ImSpinner8 } from "react-icons/im";
-// Add this to your imports section at the top
-import { FaRegCopy } from "react-icons/fa";
 import { IoCopyOutline } from "react-icons/io5";
 import { IoRefreshOutline } from "react-icons/io5";
 import { format, parseISO, differenceInDays } from "date-fns";
@@ -392,6 +390,18 @@ const DomainLogs = () => {
                                   >
                                     <IoCopyOutline className="w-3.5 h-3.5 text-gray-500" />
                                   </button>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleCheckIpGroup(item.domain);
+                                    }}
+                                    className="text-xs px-1.5 py-0.5 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+                                    title="Copy RoboMailer IP Group Query"
+                                  >
+                                    <span className="text-[10px]">
+                                      Copy IP Group Query
+                                    </span>
+                                  </button>
                                 </div>
                                 <span className="text-[10px] text-gray-400 mt-1">
                                   Last Updated - {formatDate(item?.lastUpdated)}
@@ -479,11 +489,26 @@ const DomainLogs = () => {
   );
 };
 
+// Remove the standalone handleCheckIpGroup function that was outside the component
 export default DomainLogs;
 
 const handleCopyDomain = (domain) => {
   navigator.clipboard.writeText(domain);
   toast.success("Domain copied to clipboard!", {
+    position: "bottom-center",
+    autoClose: 2000,
+  });
+};
+
+const handleCheckIpGroup = (domain) => {
+  // Create SQL query with the domain
+  const sqlQuery = `select * from ip_group_list where mail_host like '%${domain}'`;
+
+  // Copy the SQL query to clipboard
+  navigator.clipboard.writeText(sqlQuery);
+
+  // Notify the user
+  toast.info("SQL query copied to clipboard.", {
     position: "bottom-center",
     autoClose: 2000,
   });
