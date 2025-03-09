@@ -4,8 +4,9 @@ import { useState } from "react";
 // Thirdparty
 import { toast } from "react-toastify";
 import { ImSpinner8 } from "react-icons/im";
-import { IoAdd } from "react-icons/io5";
-import { IoRemove } from "react-icons/io5";
+// Add this to your imports section at the top
+import { FaRegCopy } from "react-icons/fa";
+import { IoCopyOutline } from "react-icons/io5";
 import { IoRefreshOutline } from "react-icons/io5";
 import { format, parseISO, differenceInDays } from "date-fns";
 import {
@@ -29,6 +30,7 @@ import axios from "@/utils/axiosInstance";
 // CustomHooks
 
 // Components
+// First, add the Tabs import to the Components section
 import {
   Select,
   SelectContent,
@@ -43,6 +45,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Constants
 
@@ -63,6 +66,76 @@ const DomainLogs = () => {
   const [selectedSG, setSelectedSG] = useState("");
   const [domainsData, setDomainsData] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
+  const [sortMethod, setSortMethod] = useState("delivered"); // Changed from "difference" to "delivered"
+
+  // Move the handleSortMethodChange function inside the component
+  const handleSortMethodChange = (value) => {
+    setSortMethod(value);
+    if (selectedSG) {
+      // Instead of calling handleSendgridChange which uses the state value,
+      // we'll sort the existing data directly with the new sort method
+      sortAndUpdateDomains(value);
+    }
+  };
+
+  // Add a new function to sort domains with a specific sort method
+  const sortAndUpdateDomains = (sortValue) => {
+    if (domainsData.length === 0) return;
+
+    // Find the "not found" domain if it exists
+    const notFoundDomain = domainsData.find(
+      (item) => item.domain === "not found"
+    );
+
+    // Get all other domains
+    const otherDomains = domainsData.filter(
+      (item) => item.domain !== "not found"
+    );
+
+    // Separate recent and old domains
+    const recentDomains = [];
+    const oldDomains = [];
+
+    otherDomains.forEach((domain) => {
+      if (isOldDomain(domain.lastUpdated)) {
+        oldDomains.push(domain);
+      } else {
+        recentDomains.push(domain);
+      }
+    });
+
+    // Sort domains based on selected method
+    if (sortValue === "difference") {
+      // Sort by lowest difference between delivered and blocked
+      recentDomains.sort(
+        (a, b) =>
+          Math.abs(a.eventCounts.delivered - a.eventCounts.blocked) -
+          Math.abs(b.eventCounts.delivered - b.eventCounts.blocked)
+      );
+      oldDomains.sort(
+        (a, b) =>
+          Math.abs(a.eventCounts.delivered - a.eventCounts.blocked) -
+          Math.abs(b.eventCounts.delivered - b.eventCounts.blocked)
+      );
+    } else {
+      // Sort by highest delivered count
+      recentDomains.sort(
+        (a, b) => b.eventCounts.delivered - a.eventCounts.delivered
+      );
+      oldDomains.sort(
+        (a, b) => b.eventCounts.delivered - a.eventCounts.delivered
+      );
+    }
+
+    // Combine all domains in order: recent -> not found -> old
+    const finalSortedData = [
+      ...recentDomains,
+      ...(notFoundDomain ? [notFoundDomain] : []),
+      ...oldDomains,
+    ];
+
+    setDomainsData(finalSortedData);
+  };
 
   const isOldDomain = (dateString) => {
     if (!dateString) return true;
@@ -104,14 +177,28 @@ const DomainLogs = () => {
           }
         });
 
-        // Sort recent domains by blocked count
-        recentDomains.sort(
-          (a, b) => b.eventCounts.blocked - a.eventCounts.blocked
-        );
-        // Sort old domains by blocked count
-        oldDomains.sort(
-          (a, b) => b.eventCounts.blocked - a.eventCounts.blocked
-        );
+        // Sort domains based on selected method
+        if (sortMethod === "difference") {
+          // Sort by lowest difference between delivered and blocked
+          recentDomains.sort(
+            (a, b) =>
+              Math.abs(a.eventCounts.delivered - a.eventCounts.blocked) -
+              Math.abs(b.eventCounts.delivered - b.eventCounts.blocked)
+          );
+          oldDomains.sort(
+            (a, b) =>
+              Math.abs(a.eventCounts.delivered - a.eventCounts.blocked) -
+              Math.abs(b.eventCounts.delivered - b.eventCounts.blocked)
+          );
+        } else {
+          // Sort by highest delivered count
+          recentDomains.sort(
+            (a, b) => b.eventCounts.delivered - a.eventCounts.delivered
+          );
+          oldDomains.sort(
+            (a, b) => b.eventCounts.delivered - a.eventCounts.delivered
+          );
+        }
 
         // Combine all domains in order: recent -> not found -> old
         const finalSortedData = [
@@ -212,21 +299,39 @@ const DomainLogs = () => {
                 Select Sendgrid account
               </Label>
               <div className="flex items-center justify-between">
-                <div className="w-[200px]">
-                  <Select
-                    onValueChange={handleSendgridChange}
-                    value={selectedSG}
-                    id="sendgrid-select"
+                <div className="flex items-center gap-4">
+                  <div className="w-[200px]">
+                    <Select
+                      onValueChange={handleSendgridChange}
+                      value={selectedSG}
+                      id="sendgrid-select"
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Sendgrid" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="2">Sendgrid 2</SelectItem>
+                        <SelectItem value="3">Sendgrid 3</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <Tabs
+                    value={sortMethod}
+                    onValueChange={handleSortMethodChange}
+                    className="w-[400px]"
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Sendgrid" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="2">Sendgrid 2</SelectItem>
-                      <SelectItem value="3">Sendgrid 3</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="delivered">
+                        Sort by Highest Delivered
+                      </TabsTrigger>
+                      <TabsTrigger value="difference">
+                        Sort by Delivery Issues
+                      </TabsTrigger>
+                    </TabsList>
+                  </Tabs>
                 </div>
+
                 <button
                   onClick={handleRefresh}
                   disabled={isFetching || !selectedSG}
@@ -269,13 +374,25 @@ const DomainLogs = () => {
                           <AccordionTrigger className="hover:no-underline py-4">
                             <div className="flex justify-between items-center w-full">
                               <div className="flex flex-col items-start">
-                                <span
-                                  className={`text-sm ${
-                                    isOld ? "text-gray-400" : ""
-                                  }`}
-                                >
-                                  {item.domain}
-                                </span>
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className={`text-sm ${
+                                      isOld ? "text-gray-400" : ""
+                                    }`}
+                                  >
+                                    {item.domain}
+                                  </span>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleCopyDomain(item.domain);
+                                    }}
+                                    className="p-1.5 hover:bg-gray-100 rounded-md transition-colors"
+                                    title="Copy domain"
+                                  >
+                                    <IoCopyOutline className="w-3.5 h-3.5 text-gray-500" />
+                                  </button>
+                                </div>
                                 <span className="text-[10px] text-gray-400 mt-1">
                                   Last Updated - {formatDate(item?.lastUpdated)}
                                 </span>
@@ -363,3 +480,11 @@ const DomainLogs = () => {
 };
 
 export default DomainLogs;
+
+const handleCopyDomain = (domain) => {
+  navigator.clipboard.writeText(domain);
+  toast.success("Domain copied to clipboard!", {
+    position: "bottom-center",
+    autoClose: 2000,
+  });
+};
