@@ -20,7 +20,7 @@ const EmailHeadersForm = () => {
       : {
           Date: "{{dh}}",
           To: `"{{03}} {{04}}" <{{01}}>`,
-          From: `"Support" <support@{{ho}}>`,
+          From: `"Support" <support@{{hd}}>`,
           "Message-ID": "<{{m0}}{{02}}.{{tm}}.{{qd}}@{{hd}}>",
           Subject:
             "{{03}} {{04}}, {[Simple and fast loans tailored to your needs.|Quick financial assistance when you need it most.|Get up to $1,000 with an easy online application.|Borrow confidently with fast approval times.|Apply now and secure the cash you need today.|Hassle-free loans available in just a few minutes.|Flexible loan options - designed for you.|Get a decision fast and cash even faster.|Reliable loans up to $1,000 with minimal effort.|Don't stress - fast loans are just a click away.]}",
