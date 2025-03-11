@@ -103,18 +103,23 @@ const DomainLogs = () => {
     });
 
     // Sort domains based on selected method
+    // Sort domains based on selected method
     if (sortValue === "difference") {
-      // Sort by lowest difference between delivered and blocked
-      recentDomains.sort(
-        (a, b) =>
-          Math.abs(a.eventCounts.delivered - a.eventCounts.blocked) -
-          Math.abs(b.eventCounts.delivered - b.eventCounts.blocked)
-      );
-      oldDomains.sort(
-        (a, b) =>
-          Math.abs(a.eventCounts.delivered - a.eventCounts.blocked) -
-          Math.abs(b.eventCounts.delivered - b.eventCounts.blocked)
-      );
+      // Sort by block rate (blocked / total emails)
+      recentDomains.sort((a, b) => {
+        const totalA = a.eventCounts.delivered + a.eventCounts.blocked;
+        const totalB = b.eventCounts.delivered + b.eventCounts.blocked;
+        const blockRateA = totalA > 0 ? a.eventCounts.blocked / totalA : 0;
+        const blockRateB = totalB > 0 ? b.eventCounts.blocked / totalB : 0;
+        return blockRateB - blockRateA; // Higher block rate first
+      });
+      oldDomains.sort((a, b) => {
+        const totalA = a.eventCounts.delivered + a.eventCounts.blocked;
+        const totalB = b.eventCounts.delivered + b.eventCounts.blocked;
+        const blockRateA = totalA > 0 ? a.eventCounts.blocked / totalA : 0;
+        const blockRateB = totalB > 0 ? b.eventCounts.blocked / totalB : 0;
+        return blockRateB - blockRateA; // Higher block rate first
+      });
     } else {
       // Sort by highest delivered count
       recentDomains.sort(
@@ -139,11 +144,20 @@ const DomainLogs = () => {
     if (!dateString) return true;
     try {
       const date = parseISO(dateString);
+      // Fix the date comparison - check if the date is more than 3 days old
       const daysDifference = differenceInDays(new Date(), date);
-      return daysDifference > 7;
+      // Remove the console.log that was used for debugging
+      return daysDifference > 3;
     } catch (error) {
+      console.error(`Error parsing date: ${dateString}`, error);
       return true;
     }
+  };
+
+  // Add a new function to determine if we should show the inactive domains header
+  const shouldShowInactiveDomainHeader = (domains) => {
+    // Check if there are any old domains
+    return domains.some((domain) => isOldDomain(domain.lastUpdated));
   };
 
   const handleSendgridChange = async (value) => {
@@ -177,17 +191,21 @@ const DomainLogs = () => {
 
         // Sort domains based on selected method
         if (sortMethod === "difference") {
-          // Sort by lowest difference between delivered and blocked
-          recentDomains.sort(
-            (a, b) =>
-              Math.abs(a.eventCounts.delivered - a.eventCounts.blocked) -
-              Math.abs(b.eventCounts.delivered - b.eventCounts.blocked)
-          );
-          oldDomains.sort(
-            (a, b) =>
-              Math.abs(a.eventCounts.delivered - a.eventCounts.blocked) -
-              Math.abs(b.eventCounts.delivered - b.eventCounts.blocked)
-          );
+          // Sort by block rate (blocked / total emails)
+          recentDomains.sort((a, b) => {
+            const totalA = a.eventCounts.delivered + a.eventCounts.blocked;
+            const totalB = b.eventCounts.delivered + b.eventCounts.blocked;
+            const blockRateA = totalA > 0 ? a.eventCounts.blocked / totalA : 0;
+            const blockRateB = totalB > 0 ? b.eventCounts.blocked / totalB : 0;
+            return blockRateB - blockRateA; // Higher block rate first
+          });
+          oldDomains.sort((a, b) => {
+            const totalA = a.eventCounts.delivered + a.eventCounts.blocked;
+            const totalB = b.eventCounts.delivered + b.eventCounts.blocked;
+            const blockRateA = totalA > 0 ? a.eventCounts.blocked / totalA : 0;
+            const blockRateB = totalB > 0 ? b.eventCounts.blocked / totalB : 0;
+            return blockRateB - blockRateA; // Higher block rate first
+          });
         } else {
           // Sort by highest delivered count
           recentDomains.sort(
@@ -324,7 +342,7 @@ const DomainLogs = () => {
                         Sort by Highest Delivered
                       </TabsTrigger>
                       <TabsTrigger value="difference">
-                        Sort by Delivery Issues
+                        Sort by Block Rate
                       </TabsTrigger>
                     </TabsList>
                   </Tabs>
@@ -347,138 +365,258 @@ const DomainLogs = () => {
 
             {domainsData.length > 0 && (
               <div className="mt-4">
-                <Accordion type="multiple" className="space-y-2">
-                  {domainsData.map((item, index) => {
-                    const isOld = isOldDomain(item.lastUpdated);
-                    const isFirstOldDomain =
-                      isOld &&
-                      !isOldDomain(domainsData[index - 1]?.lastUpdated);
+                {/* Add a header for active domains */}
+                <h4 className="text-sm text-black px-1 mb-2">Active domains</h4>
 
-                    return (
-                      <>
-                        {isFirstOldDomain && (
-                          <div className="space-y-2 pt-4">
-                            <div className="h-px bg-gray-200 mb-4" />
-                            <h4 className="text-sm text-black px-1 mt-4">
-                              Inactive domains
-                            </h4>
-                          </div>
-                        )}
-                        <AccordionItem
-                          key={index}
-                          value={item.domain}
-                          className="border border-gray-200 rounded-md bg-white px-4"
-                        >
-                          <AccordionTrigger className="hover:no-underline py-4">
-                            <div className="flex justify-between items-center w-full">
-                              <div className="flex flex-col items-start">
-                                <div className="flex items-center gap-2">
-                                  <span
-                                    className={`text-sm ${
-                                      isOld ? "text-gray-400" : ""
-                                    }`}
-                                  >
-                                    {item.domain}
+                <Accordion type="multiple" className="space-y-2">
+                  {/* First render active domains */}
+                  {domainsData
+                    .filter((item) => !isOldDomain(item.lastUpdated))
+                    .map((item, index) => (
+                      <AccordionItem
+                        key={`active-${index}`}
+                        value={`active-${item.domain}`}
+                        className="border border-gray-200 rounded-md bg-white px-4"
+                      >
+                        <AccordionTrigger className="hover:no-underline py-4">
+                          <div className="flex justify-between items-center w-full">
+                            <div className="flex flex-col items-start">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm">{item.domain}</span>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleCopyDomain(item.domain);
+                                  }}
+                                  className="p-1.5 hover:bg-gray-100 rounded-md transition-colors"
+                                  title="Copy domain"
+                                >
+                                  <IoCopyOutline className="w-3.5 h-3.5 text-gray-500" />
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleCheckIpGroup(item.domain);
+                                  }}
+                                  className="text-xs px-1.5 py-0.5 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+                                  title="Copy RoboMailer IP Group Query"
+                                >
+                                  <span className="text-[10px]">
+                                    Copy IP Group Query
                                   </span>
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleCopyDomain(item.domain);
-                                    }}
-                                    className="p-1.5 hover:bg-gray-100 rounded-md transition-colors"
-                                    title="Copy domain"
-                                  >
-                                    <IoCopyOutline className="w-3.5 h-3.5 text-gray-500" />
-                                  </button>
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleCheckIpGroup(item.domain);
-                                    }}
-                                    className="text-xs px-1.5 py-0.5 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
-                                    title="Copy RoboMailer IP Group Query"
-                                  >
-                                    <span className="text-[10px]">
-                                      Copy IP Group Query
-                                    </span>
-                                  </button>
-                                </div>
-                                <span className="text-[10px] text-gray-400 mt-1">
-                                  Last Updated - {formatDate(item?.lastUpdated)}
+                                </button>
+                              </div>
+                              <span className="text-[10px] text-gray-400 mt-1">
+                                Last Updated - {formatDate(item?.lastUpdated)}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-4 mr-4">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                                <span className="text-sm text-gray-600">
+                                  {item.eventCounts.delivered}
                                 </span>
                               </div>
-                              <div className="flex items-center gap-4 mr-4">
-                                <div className="flex items-center gap-2">
-                                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                                  <span
-                                    className={`text-sm ${
-                                      isOld ? "text-gray-400" : "text-gray-600"
-                                    }`}
-                                  >
-                                    {item.eventCounts.delivered}
-                                  </span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                                  <span
-                                    className={`text-sm ${
-                                      isOld ? "text-gray-400" : "text-gray-600"
-                                    }`}
-                                  >
-                                    {item.eventCounts.blocked}
-                                  </span>
-                                </div>
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                                <span className="text-sm text-gray-600">
+                                  {item.eventCounts.blocked}{" "}
+                                  {item.eventCounts.delivered +
+                                    item.eventCounts.blocked >
+                                    0 && (
+                                    <span className="text-xs text-gray-400">
+                                      (
+                                      {Math.round(
+                                        (item.eventCounts.blocked /
+                                          (item.eventCounts.delivered +
+                                            item.eventCounts.blocked)) *
+                                          100
+                                      )}
+                                      %)
+                                    </span>
+                                  )}
+                                </span>
                               </div>
                             </div>
-                          </AccordionTrigger>
-                          <AccordionContent>
-                            <div className="py-6 px-4 border-t">
-                              <div className="h-[300px] w-full">
-                                <ResponsiveContainer width="100%" height="100%">
-                                  <BarChart
-                                    data={prepareChartData(
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          {/* Content remains the same */}
+                          <div className="py-6 px-4 border-t">
+                            <div className="h-[300px] w-full">
+                              <ResponsiveContainer width="100%" height="100%">
+                                <BarChart
+                                  data={prepareChartData(
+                                    item.blockedEmailHosts
+                                  )}
+                                  margin={{
+                                    top: 20,
+                                    right: 30,
+                                    left: 30,
+                                    bottom: 60,
+                                  }}
+                                >
+                                  <CartesianGrid
+                                    strokeDasharray="3 3"
+                                    vertical={false}
+                                  />
+                                  <XAxis
+                                    dataKey="name"
+                                    angle={-45}
+                                    textAnchor="end"
+                                    height={60}
+                                    interval={0}
+                                    tick={{ fontSize: 12 }}
+                                  />
+                                  <YAxis tick={{ fontSize: 12 }} />
+                                  <Tooltip content={<CustomTooltip />} />
+                                  <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                                    {prepareChartData(
                                       item.blockedEmailHosts
-                                    )}
-                                    margin={{
-                                      top: 20,
-                                      right: 30,
-                                      left: 30,
-                                      bottom: 60,
-                                    }}
-                                  >
-                                    <CartesianGrid
-                                      strokeDasharray="3 3"
-                                      vertical={false}
-                                    />
-                                    <XAxis
-                                      dataKey="name"
-                                      angle={-45}
-                                      textAnchor="end"
-                                      height={60}
-                                      interval={0}
-                                      tick={{ fontSize: 12 }}
-                                    />
-                                    <YAxis tick={{ fontSize: 12 }} />
-                                    <Tooltip content={<CustomTooltip />} />
-                                    <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                                      {prepareChartData(
-                                        item.blockedEmailHosts
-                                      ).map((entry, index) => (
-                                        <Cell
-                                          key={`cell-${index}`}
-                                          fill={entry.color}
-                                        />
-                                      ))}
-                                    </Bar>
-                                  </BarChart>
-                                </ResponsiveContainer>
+                                    ).map((entry, index) => (
+                                      <Cell
+                                        key={`cell-${index}`}
+                                        fill={entry.color}
+                                      />
+                                    ))}
+                                  </Bar>
+                                </BarChart>
+                              </ResponsiveContainer>
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+
+                  {/* Then render inactive domains if there are any */}
+                  {shouldShowInactiveDomainHeader(domainsData) && (
+                    <div className="space-y-2 pt-4">
+                      <div className="h-px bg-gray-200 mb-4" />
+                      <h4 className="text-sm text-black px-1 mt-4">
+                        Inactive domains
+                      </h4>
+                    </div>
+                  )}
+
+                  {domainsData
+                    .filter((item) => isOldDomain(item.lastUpdated))
+                    .map((item, index) => (
+                      <AccordionItem
+                        key={`inactive-${index}`}
+                        value={`inactive-${item.domain}`}
+                        className="border border-gray-200 rounded-md bg-white px-4"
+                      >
+                        <AccordionTrigger className="hover:no-underline py-4">
+                          <div className="flex justify-between items-center w-full">
+                            <div className="flex flex-col items-start">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm text-gray-400">
+                                  {item.domain}
+                                </span>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleCopyDomain(item.domain);
+                                  }}
+                                  className="p-1.5 hover:bg-gray-100 rounded-md transition-colors"
+                                  title="Copy domain"
+                                >
+                                  <IoCopyOutline className="w-3.5 h-3.5 text-gray-500" />
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleCheckIpGroup(item.domain);
+                                  }}
+                                  className="text-xs px-1.5 py-0.5 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
+                                  title="Copy RoboMailer IP Group Query"
+                                >
+                                  <span className="text-[10px]">
+                                    Copy IP Group Query
+                                  </span>
+                                </button>
+                              </div>
+                              <span className="text-[10px] text-gray-400 mt-1">
+                                Last Updated - {formatDate(item?.lastUpdated)}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-4 mr-4">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                                <span className="text-sm text-gray-400">
+                                  {item.eventCounts.delivered}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                                <span className="text-sm text-gray-400">
+                                  {item.eventCounts.blocked}{" "}
+                                  {item.eventCounts.delivered +
+                                    item.eventCounts.blocked >
+                                    0 && (
+                                    <span className="text-xs text-gray-400">
+                                      (
+                                      {Math.round(
+                                        (item.eventCounts.blocked /
+                                          (item.eventCounts.delivered +
+                                            item.eventCounts.blocked)) *
+                                          100
+                                      )}
+                                      %)
+                                    </span>
+                                  )}
+                                </span>
                               </div>
                             </div>
-                          </AccordionContent>
-                        </AccordionItem>
-                      </>
-                    );
-                  })}
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          {/* Content remains the same */}
+                          <div className="py-6 px-4 border-t">
+                            <div className="h-[300px] w-full">
+                              <ResponsiveContainer width="100%" height="100%">
+                                <BarChart
+                                  data={prepareChartData(
+                                    item.blockedEmailHosts
+                                  )}
+                                  margin={{
+                                    top: 20,
+                                    right: 30,
+                                    left: 30,
+                                    bottom: 60,
+                                  }}
+                                >
+                                  <CartesianGrid
+                                    strokeDasharray="3 3"
+                                    vertical={false}
+                                  />
+                                  <XAxis
+                                    dataKey="name"
+                                    angle={-45}
+                                    textAnchor="end"
+                                    height={60}
+                                    interval={0}
+                                    tick={{ fontSize: 12 }}
+                                  />
+                                  <YAxis tick={{ fontSize: 12 }} />
+                                  <Tooltip content={<CustomTooltip />} />
+                                  <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                                    {prepareChartData(
+                                      item.blockedEmailHosts
+                                    ).map((entry, index) => (
+                                      <Cell
+                                        key={`cell-${index}`}
+                                        fill={entry.color}
+                                      />
+                                    ))}
+                                  </Bar>
+                                </BarChart>
+                              </ResponsiveContainer>
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
                 </Accordion>
               </div>
             )}
