@@ -28,13 +28,12 @@ const TemplateRebuild = () => {
   const [htmlPreview, setHtmlPreview] = useState("");
   const [originalHtml, setOriginalHtml] = useState("");
 
-  // Add these new state variables for template variations
   const [htmlStructureOptions, setHtmlStructureOptions] = useState({
     addRandomComments: true,
     varyWhitespace: true,
     addRandomAttributes: true,
-    randomizeInlineStyleOrder: false,
-    randomizeAttributeOrder: false,
+    randomizeInlineStyleOrder: true,
+    randomizeAttributeOrder: true,
   });
 
   const [fontOptions, setFontOptions] = useState({
