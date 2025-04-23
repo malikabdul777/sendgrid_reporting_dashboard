@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { IoCopyOutline } from "react-icons/io5";
 import { MdDeleteForever } from "react-icons/md";
 import { IoAddOutline } from "react-icons/io5";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import he from "he";
 

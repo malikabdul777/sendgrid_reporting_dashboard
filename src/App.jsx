@@ -16,6 +16,7 @@ import DomainAuth from "./pages/DomainAuth/DomainAuth";
 import AddWebformDomainDetails from "./components/AddWebformDomainDetails/AddWebformDomainDetails";
 import WebformBlocks from "./pages/WebformBlocks/WebformBlocks";
 import TemplateBuilder from "./pages/TemplateBuilder/TemplateBuilder";
+import TemplateRebuild from "./pages/TemplateRebuild/TemplateRebuild";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
             <Route path="domain-logs" element={<DomainLogs />} />
             <Route path="spam-reporters" element={<Reporters />} />
             <Route path="webform-blocks-check" element={<WebformBlocks />} />
+            <Route path="template-rebuild" element={<TemplateRebuild />} />
 
             {/* Fallback Route */}
             <Route path="*" element={<Navigate to="/domain-auth" />} />

@@ -1,0 +1,47 @@
+.container {
+  padding-block: 50px 50px;
+  height: auto;
+  position: relative;
+}
+
+.wrapper {
+  border: 1px solid var(--lightGrey);
+  width: 100%;
+  height: 100%;
+  padding: 30px 40px;
+  border-radius: 20px;
+  margin-bottom: 50px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 40px;
+}
+
+.subHeading {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.tallTextarea {
+  min-height: 300px;
+}
+
+.previewContainer {
+  position: sticky;
+  top: 20px;
+  align-self: flex-start;
+  max-height: calc(100vh - 100px);
+  display: flex;
+  flex-direction: column;
+}
+
+.previewFrame {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  background-color: white;
+  height: calc(100vh - 150px);
+  overflow: auto;
+}

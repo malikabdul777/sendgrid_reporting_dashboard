@@ -8,6 +8,7 @@ import { BsDatabase } from "react-icons/bs";
 import { useLocation } from "react-router-dom";
 import { GoShieldLock } from "react-icons/go";
 import { FiEdit } from "react-icons/fi";
+import { IoBuild } from "react-icons/io5";
 
 // Utils
 
@@ -77,6 +78,24 @@ const Sidebar = () => {
                 }`}
               />
               <p className={styles.navLinkText}>Template Bui</p>
+            </div>
+          </NavLink>
+
+          <NavLink
+            to="template-rebuild"
+            className={`${styles.navLink} ${
+              pathname === "/template-rebuild" ? styles.activeNavLink : null
+            }`}
+            title={"Template Rebuilder"}
+          >
+            <div className={styles.item}>
+              <IoBuild
+                size={20}
+                className={`${
+                  pathname === "/template-rebuild" ? styles.activeIcon : null
+                }`}
+              />
+              <p className={styles.navLinkText}>Template Reb</p>
             </div>
           </NavLink>
 
