@@ -287,3 +287,43 @@ export const varyCssProperties = (htmlString, cssOptions) => {
 
   return processHtmlChunks(chunks, processor);
 };
+
+// Randomize the order of CSS properties in inline style attributes
+export const randomizeInlineStyleOrder = (htmlString) => {
+  return htmlString.replace(
+    /style=(["'])(.*?)\1/gi,
+    (match, quote, styleContent) => {
+      // Split style properties, shuffle, and rejoin
+      const props = styleContent
+        .split(";")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      for (let i = props.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [props[i], props[j]] = [props[j], props[i]];
+      }
+      return `style=${quote}${props.join("; ")}${
+        props.length ? ";" : ""
+      }${quote}`;
+    }
+  );
+};
+
+// Randomize the order of HTML attributes in tags
+export const randomizeAttributeOrder = (htmlString) => {
+  return htmlString.replace(
+    /<([a-zA-Z0-9]+)\s+([^>]+)>/g,
+    (match, tag, attrs) => {
+      // Split attributes, shuffle, and rejoin
+      const attrArray = attrs.match(
+        /([^\s=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'>]+))?)/g
+      );
+      if (!attrArray) return match;
+      for (let i = attrArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [attrArray[i], attrArray[j]] = [attrArray[j], attrArray[i]];
+      }
+      return `<${tag} ${attrArray.join(" ")}>`;
+    }
+  );
+};

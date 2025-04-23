@@ -6,7 +6,6 @@ import "react-toastify/dist/ReactToastify.css";
 import styles from "./TemplateRebuild.module.css";
 
 import TemplateInput from "./components/TemplateInput";
-import ColorReplacements from "./components/ColorReplacements";
 import HtmlPreview from "./components/HtmlPreview";
 import TemplateVariations from "./components/TemplateVariations";
 import { Label } from "@/components/ui/label";
@@ -18,6 +17,8 @@ import {
   addRandomAttributesToString,
   varyFontProperties,
   varyCssProperties,
+  randomizeInlineStyleOrder,
+  randomizeAttributeOrder,
 } from "./components/htmlUtils.js";
 
 const TemplateRebuild = () => {
@@ -32,6 +33,8 @@ const TemplateRebuild = () => {
     addRandomComments: true,
     varyWhitespace: true,
     addRandomAttributes: true,
+    randomizeInlineStyleOrder: false,
+    randomizeAttributeOrder: false,
   });
 
   const [fontOptions, setFontOptions] = useState({
@@ -501,6 +504,12 @@ const TemplateRebuild = () => {
     }
     if (fontOptions.varyFontFamily || fontOptions.varyFontSize) {
       updatedHtml = varyFontProperties(updatedHtml, fontOptions);
+    }
+    if (htmlStructureOptions.randomizeInlineStyleOrder) {
+      updatedHtml = randomizeInlineStyleOrder(updatedHtml);
+    }
+    if (htmlStructureOptions.randomizeAttributeOrder) {
+      updatedHtml = randomizeAttributeOrder(updatedHtml);
     }
     if (
       cssOptions.varyPadding ||

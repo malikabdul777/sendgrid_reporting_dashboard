@@ -68,6 +68,37 @@ const HtmlStructureVariation = ({
             <Label htmlFor="add-attributes">Add random data attributes</Label>
           </div>
 
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="randomize-inline-style-order"
+              checked={htmlStructureOptions.randomizeInlineStyleOrder}
+              onCheckedChange={(checked) =>
+                setHtmlStructureOptions((prev) => ({
+                  ...prev,
+                  randomizeInlineStyleOrder: checked,
+                }))
+              }
+            />
+            <Label htmlFor="randomize-inline-style-order">
+              Randomize Inline Style Order
+            </Label>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="randomize-attribute-order"
+              checked={htmlStructureOptions.randomizeAttributeOrder}
+              onCheckedChange={(checked) =>
+                setHtmlStructureOptions((prev) => ({
+                  ...prev,
+                  randomizeAttributeOrder: checked,
+                }))
+              }
+            />
+            <Label htmlFor="randomize-attribute-order">
+              Randomize HTML Attribute Order
+            </Label>
+          </div>
           {/* <Button
             variant="outline"
             className="mt-2"
