@@ -19,6 +19,7 @@ import {
   varyCssProperties,
   randomizeInlineStyleOrder,
   randomizeAttributeOrder,
+  randomizeClassNames,
 } from "./components/htmlUtils.js";
 
 const TemplateRebuild = () => {
@@ -50,6 +51,7 @@ const TemplateRebuild = () => {
     marginVariation: 2,
     varyBorderRadius: false,
     borderRadiusVariation: 1,
+    randomizeClassNames: true,
   });
 
   // Extract HTML content whenever the email template changes
@@ -88,7 +90,6 @@ const TemplateRebuild = () => {
     Object.entries(replacementColors).forEach(([originalColor, newColor]) => {
       if (newColor && originalColor !== newColor) {
         // Create a regex that targets colors in style attributes and CSS rules
-        // but avoids URLs and other non-color contexts
         const safeColorRegex = new RegExp(
           `(color:|background(-color)?:|border(-color)?:|fill:|stroke:|\\s+)${originalColor.replace(
             /[.*+?^${}()|[\]\\]/g,
@@ -516,6 +517,10 @@ const TemplateRebuild = () => {
       cssOptions.varyBorderRadius
     ) {
       updatedHtml = varyCssProperties(updatedHtml, cssOptions);
+    }
+
+    if (cssOptions.randomizeClassNames) {
+      updatedHtml = randomizeClassNames(updatedHtml);
     }
 
     // Apply color replacements last

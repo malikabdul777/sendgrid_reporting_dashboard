@@ -129,6 +129,23 @@ const CssStyleRandomizer = ({ cssOptions, setCssOptions }) => {
               />
             </div>
           )}
+
+          {/* Add checkbox for randomize class names */}
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="randomize-class-names"
+              checked={cssOptions.randomizeClassNames}
+              onCheckedChange={(checked) =>
+                setCssOptions((prev) => ({
+                  ...prev,
+                  randomizeClassNames: checked,
+                }))
+              }
+            />
+            <Label htmlFor="randomize-class-names">
+              Randomize class names in CSS and HTML
+            </Label>
+          </div>
         </div>
       </AccordionContent>
     </AccordionItem>

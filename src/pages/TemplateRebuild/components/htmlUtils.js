@@ -327,3 +327,73 @@ export const randomizeAttributeOrder = (htmlString) => {
     }
   );
 };
+
+// Helper to randomize class names in both <style> tags and HTML content
+export const randomizeClassNames = (htmlString) => {
+  // 1. Extract <style>...</style> blocks
+  const styleRegex = /<style[^>]*>([\s\S]*?)<\/style>/gi;
+  let styleBlocks = [];
+  let match;
+  while ((match = styleRegex.exec(htmlString)) !== null) {
+    styleBlocks.push({
+      start: match.index,
+      end: styleRegex.lastIndex,
+      css: match[1],
+    });
+  }
+
+  // 2. Extract all class names from CSS and HTML
+  const classSet = new Set();
+
+  // From CSS
+  styleBlocks.forEach(({ css }) => {
+    // Match .className, .className:hover, etc.
+    const cssClassRegex = /\.([a-zA-Z0-9_-]+)[\s\.\:\,\{\[]/g;
+    let cssMatch;
+    while ((cssMatch = cssClassRegex.exec(css)) !== null) {
+      classSet.add(cssMatch[1]);
+    }
+  });
+
+  // From HTML
+  const htmlClassRegex = /class=["']([^"']+)["']/gi;
+  let htmlMatch;
+  while ((htmlMatch = htmlClassRegex.exec(htmlString)) !== null) {
+    htmlMatch[1].split(/\s+/).forEach((cls) => {
+      if (cls) classSet.add(cls);
+    });
+  }
+
+  // 3. Generate a mapping from original class names to randomized names
+  const classMap = {};
+  let counter = 0;
+  classSet.forEach((cls) => {
+    classMap[cls] = `cls_${Math.random()
+      .toString(36)
+      .substr(2, 5)}_${counter++}`;
+  });
+
+  // 4. Replace class names in CSS
+  let newHtml = htmlString.replace(styleRegex, (full, cssContent) => {
+    let newCss = cssContent;
+    Object.entries(classMap).forEach(([orig, rand]) => {
+      // Replace .className, .className:hover, etc.
+      newCss = newCss.replace(
+        new RegExp(`\\.${orig}(?![a-zA-Z0-9_-])`, "g"),
+        `.${rand}`
+      );
+    });
+    return full.replace(cssContent, newCss);
+  });
+
+  // 5. Replace class names in HTML
+  newHtml = newHtml.replace(htmlClassRegex, (full, classList) => {
+    const newClassList = classList
+      .split(/\s+/)
+      .map((cls) => classMap[cls] || cls)
+      .join(" ");
+    return `class="${newClassList}"`;
+  });
+
+  return newHtml;
+};
