@@ -9,6 +9,7 @@ import { useLocation } from "react-router-dom";
 import { GoShieldLock } from "react-icons/go";
 import { FiEdit } from "react-icons/fi";
 import { IoBuild } from "react-icons/io5";
+import { GiMagickTrick } from "react-icons/gi";
 
 // Utils
 
@@ -63,6 +64,25 @@ const Sidebar = () => {
               <p className={styles.navLinkText}>Domain Auth</p>
             </div>
           </NavLink>
+
+          <NavLink
+            to="MIME-buster"
+            className={`${styles.navLink} ${
+              pathname === "/MIME-buster" ? styles.activeNavLink : null
+            }`}
+            title={"MIME Buster"}
+          >
+            <div className={styles.item}>
+              <GiMagickTrick
+                size={16}
+                className={`${
+                  pathname === "/MIME-buster" ? styles.activeIcon : null
+                }`}
+              />
+              <p className={styles.navLinkText}>MIME Buster</p>
+            </div>
+          </NavLink>
+
           <NavLink
             to="template_builder"
             title={"Template Builder"}

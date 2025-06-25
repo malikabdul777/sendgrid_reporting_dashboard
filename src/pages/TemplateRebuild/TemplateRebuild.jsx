@@ -611,11 +611,11 @@ const TemplateRebuild = () => {
             </div>
           </div>
         </div>
-
         {/* Right side - Preview */}
-        <div className="w-1/2">
-          <HtmlPreview htmlPreview={htmlPreview} />
-        </div>
+        <HtmlPreview
+          htmlPreview={htmlPreview}
+          setEmailTemplate={setEmailTemplate}
+        />
       </div>
     </div>
   );

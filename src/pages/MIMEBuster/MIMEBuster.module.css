@@ -1,0 +1,666 @@
+/* Container and Layout */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  min-height: 100vh;
+}
+
+/* Header Section */
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+
+.subtitle {
+  font-size: 1.125rem;
+  color: #64748b;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* Complexity Card */
+.complexityCard {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 3rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e2e8f0;
+}
+
+.complexityHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.complexityLabel {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 1rem;
+}
+
+.complexityScore {
+  font-size: 1.5rem;
+  font-weight: 700;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
+  min-width: 5rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.scoreGreen {
+  color: #10b981;
+  background: #ecfdf5;
+}
+
+.scoreYellow {
+  color: #f59e0b;
+  background: #fffbeb;
+}
+
+.scoreRed {
+  color: #ef4444;
+  background: #fef2f2;
+}
+
+.complexityBar {
+  height: 1rem;
+  background: #f1f5f9;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.complexityFill {
+  height: 100%;
+  transition: width 0.5s ease-in-out;
+  border-radius: 0.5rem;
+}
+
+/* Actions Bar */
+.actionsBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+  gap: 2rem;
+  padding: 1rem 0.5rem;
+}
+
+.actionsLeft {
+  flex: 1;
+}
+
+.actionsRight {
+  display: flex;
+  gap: 1rem;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  padding: 0.75rem 1.5rem;
+}
+
+.actionButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.configSelect {
+  min-width: 280px;
+  background: white;
+  border: 1px solid #d1d5db;
+}
+
+/* Form Styling */
+.form {
+  background: white;
+  border-radius: 1.5rem;
+  padding: 3rem;
+  border: 1px solid #e5e7eb;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  margin-bottom: 3rem;
+}
+
+.formColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Section Styling */
+.section {
+  border-radius: 1rem;
+  padding: 2rem;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+  margin-bottom: 1rem;
+}
+
+.section:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+.checkboxItem {
+  margin-bottom: 1rem;
+}
+.label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 1rem;
+  display: block;
+  /* text-transform: uppercase; */
+  letter-spacing: 0.05em;
+  line-height: 2rem;
+}
+
+/* Input Styling */
+.textarea,
+.input,
+.select {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid #d1d5db;
+  background: white;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  padding: 0.75rem 1rem;
+}
+
+.textarea {
+  min-height: 350px !important;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  resize: vertical;
+  line-height: 1.6;
+  padding: 1rem;
+}
+
+.outputTextarea {
+  min-height: 600px !important;
+  background: #fff !important;
+  color: #000;
+  border-color: #475569;
+}
+
+.input:focus,
+.textarea:focus,
+.select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.inputError {
+  border-color: #ef4444;
+}
+
+.errorMessage {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+/* Configuration Row */
+.configRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.configItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Header Fields */
+.headerFields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.headerField {
+  display: grid;
+  grid-template-columns: 1fr 2fr auto;
+  gap: 1rem;
+  align-items: center;
+}
+
+.headerName,
+.headerValue {
+  margin: 0;
+}
+
+.removeButton {
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  font-size: 1.25rem;
+  color: #ef4444;
+  border-radius: 0.5rem;
+}
+
+.addButton {
+  font-size: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  height: auto;
+  border-radius: 0.5rem;
+}
+
+/* Action Section */
+.actionSection {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 3rem;
+  margin-top: 3rem;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.primaryButton {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  font-weight: 600;
+  padding: 1rem 2.5rem;
+  border-radius: 0.75rem;
+  border: none;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 220px;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.primaryButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+}
+
+.primaryButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.secondaryButton {
+  background: white;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  font-weight: 500;
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.secondaryButton:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+  transform: translateY(-1px);
+}
+
+/* Output Section */
+.outputSection {
+  margin-top: 3rem;
+  padding-top: 3rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Preview Modal */
+.previewModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+  backdrop-filter: blur(4px);
+}
+
+.previewModalContent {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  width: 90vw;
+  max-width: 1200px;
+  height: 80vh;
+  max-height: 800px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.previewModalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.closeButton {
+  font-size: 1.5rem;
+  line-height: 1;
+  padding: 0.5rem;
+  min-width: auto;
+  height: auto;
+  color: #6b7280;
+  border-radius: 0.5rem;
+}
+
+.closeButton:hover {
+  color: #374151;
+  background: #e5e7eb;
+}
+
+.previewContainer {
+  flex: 1;
+  margin: 0;
+  height: auto;
+  border: none;
+  border-radius: 0;
+}
+
+.previewFrame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: white;
+}
+
+/* Progress Overlay Styles */
+.progressOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(3px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.progressCard {
+  background: white;
+  border-radius: 1rem;
+  padding: 2.5rem;
+  width: 480px;
+  max-width: 90%;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  animation: fadeIn 0.4s ease-out;
+  border: 1px solid rgba(0, 102, 204, 0.1);
+}
+
+.spinnerContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #e6f7ff 0%, #f0f9ff 100%);
+  border-radius: 1rem;
+  border: 2px solid rgba(0, 102, 204, 0.1);
+}
+
+.spinner {
+  height: 3rem;
+  width: 3rem;
+  color: #0066cc;
+  animation: spin 1s linear infinite;
+  filter: drop-shadow(0 2px 4px rgba(0, 102, 204, 0.2));
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.progressTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #1a1a1a;
+  letter-spacing: -0.025em;
+}
+
+.progressText {
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  color: #0066cc;
+  font-weight: 500;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #e6f7ff 0%, #f0f9ff 100%);
+  border-radius: 0.75rem;
+  display: inline-block;
+  min-width: 80%;
+  border: 1px solid rgba(0, 102, 204, 0.2);
+}
+
+.progressSteps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-align: left;
+  margin-top: 2rem;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 0.75rem;
+}
+
+.progressStep {
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  background: #f8f9fa;
+  color: #6b7280;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+  border-left: 3px solid #e5e7eb;
+  position: relative;
+}
+
+.activeStep {
+  background: linear-gradient(135deg, #e6f7ff 0%, #f0f9ff 100%);
+  color: #0066cc;
+  font-weight: 600;
+  border-left: 3px solid #0066cc;
+  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.15);
+  transform: translateX(4px);
+}
+
+.completedStep {
+  background: linear-gradient(135deg, #f0fdf4 0%, #f7fee7 100%);
+  color: #16a34a;
+  border-left: 3px solid #16a34a;
+  font-weight: 500;
+}
+
+.completedStep::after {
+  content: "✓";
+  position: absolute;
+  right: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #16a34a;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .configRow {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .actionsBar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.5rem;
+  }
+
+  .actionsRight {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 2rem 1rem;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .form {
+    padding: 2rem;
+  }
+
+  .section {
+    padding: 1.5rem;
+  }
+
+  .buttonGroup {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .primaryButton,
+  .secondaryButton {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .headerField {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .complexityHeader {
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
+  }
+
+  .formGrid {
+    gap: 1.5rem;
+  }
+
+  .formColumn {
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 1.5rem 1rem;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .form {
+    padding: 1.5rem;
+  }
+
+  .section {
+    padding: 1.25rem;
+  }
+
+  .complexityCard {
+    padding: 1.5rem;
+  }
+
+  .actionSection {
+    padding-top: 2rem;
+    margin-top: 2rem;
+  }
+}
+/* Add this at the end of the file */
+.flexContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.flexItem {
+  flex: 1;
+  min-width: 0; /* Prevents flex items from overflowing */
+}

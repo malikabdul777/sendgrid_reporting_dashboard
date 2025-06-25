@@ -17,6 +17,8 @@ import AddWebformDomainDetails from "./components/AddWebformDomainDetails/AddWeb
 import WebformBlocks from "./pages/WebformBlocks/WebformBlocks";
 import TemplateBuilder from "./pages/TemplateBuilder/TemplateBuilder";
 import TemplateRebuild from "./pages/TemplateRebuild/TemplateRebuild";
+// Make sure this import is correct
+import MIMEBuster from "./pages/MIMEBuster/MIMEBuster";
 
 function App() {
   return (
@@ -31,7 +33,7 @@ function App() {
             <Route path="spam-reporters" element={<Reporters />} />
             <Route path="webform-blocks-check" element={<WebformBlocks />} />
             <Route path="template-rebuild" element={<TemplateRebuild />} />
-
+            <Route path="MIME-buster" element={<MIMEBuster />} />
             {/* Fallback Route */}
             <Route path="*" element={<Navigate to="/domain-auth" />} />
           </Route>
