@@ -1,6 +1,6 @@
-import path from "path";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -8,19 +8,11 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "@radix-ui/react-icons": path.resolve(
-        __dirname,
-        "node_modules/@radix-ui/react-icons"
-      ),
-      "@reduxjs/toolkit": path.resolve(
-        __dirname,
-        "node_modules/@reduxjs/toolkit"
-      ),
     },
   },
   build: {
     rollupOptions: {
-      external: ["@reduxjs/toolkit", "redux-persist", "redux"],
+      // Remove the external dependencies - let Vite bundle them
     },
   },
 });
