@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "react-toastify";
 import styles from "./Mailer.module.css";
 import { baseURL } from "@/utils/axiosInstance";
 import axiosInstance from "@/utils/axiosInstance";
@@ -14,6 +14,9 @@ const Mailer = () => {
   const [accessToken, setAccessToken] = useState(null);
   const [authLoading, setAuthLoading] = useState(false);
   const [showManualEntry, setShowManualEntry] = useState(false);
+  const [showPopupNotification, setShowPopupNotification] = useState(false);
+  const [showUrlInput, setShowUrlInput] = useState(false);
+  const [urlInput, setUrlInput] = useState("");
 
   // State for email content and recipients
   const [htmlContent, setHtmlContent] = useState(null);
@@ -47,15 +50,15 @@ const Mailer = () => {
 
     // Validate file type
     if (!file.name.toLowerCase().endsWith(".json")) {
-      toast.error("Please upload a valid JSON file");
-      return;
-    }
+        toast.error("Please upload a valid JSON file");
+        return;
+      }
 
     // Validate file size (max 1MB)
     if (file.size > 1024 * 1024) {
-      toast.error("File size too large. Please upload a file smaller than 1MB");
-      return;
-    }
+        toast.error("File size too large. Please upload a file smaller than 1MB");
+        return;
+      }
 
     // Extract email from filename (remove .json extension)
     const fileName = file.name;
@@ -138,7 +141,7 @@ const Mailer = () => {
     reader.readAsText(file);
   };
 
-  // Initiate OAuth flow directly without backend token checking
+  // Initiate OAuth flow with popup notification
   const handleAuthorize = () => {
     if (!oauthCredentials) {
       toast.error("Please upload OAuth credentials first");
@@ -152,7 +155,59 @@ const Mailer = () => {
 
     setAuthLoading(true);
     setShowManualEntry(true);
+    setShowPopupNotification(true);
+    setShowUrlInput(true);
+    setUrlInput("");
+
+    // Auto-hide popup after 4 seconds and start OAuth flow
+    setTimeout(() => {
+      setShowPopupNotification(false);
+      initiateOAuthFlow();
+    }, 4000);
+  };
+
+  // Close popup manually and start OAuth flow
+  const closePopupAndStartAuth = () => {
+    setShowPopupNotification(false);
     initiateOAuthFlow();
+  };
+
+  // Extract code from URL input
+  const extractCodeFromUrl = () => {
+    if (!urlInput || !urlInput.trim()) {
+      toast.error("Please enter a URL");
+      return;
+    }
+
+    let code = urlInput.trim();
+
+    // If input looks like a URL, extract the code parameter
+    if (code.includes("localhost") || code.includes("code=")) {
+      try {
+        const url = new URL(
+          code.startsWith("http")
+            ? code
+            : "http://localhost:8080?" + code.split("?")[1]
+        );
+        const extractedCode = url.searchParams.get("code");
+        if (extractedCode) {
+          code = extractedCode;
+        }
+      } catch (error) {
+        // If URL parsing fails, try regex extraction
+        const codeMatch = code.match(/code=([^&]+)/);
+        if (codeMatch) {
+          code = codeMatch[1];
+        }
+      }
+    }
+
+    if (code && code.length > 10) {
+      // Basic validation for code length
+      exchangeCodeForToken(code);
+    } else {
+      toast.error("Could not extract authorization code from URL");
+    }
   };
 
   // Exchange authorization code for refresh and access tokens
@@ -178,8 +233,8 @@ const Mailer = () => {
         setRefreshToken(tokenData.refresh_token);
         setAccessToken(tokenData.access_token);
         toast.success(
-          "Gmail authorization successful! You can now send emails."
-        );
+           "Gmail authorization successful! You can now send emails."
+         );
       } else {
         toast.error("Failed to obtain tokens. Please try again.");
       }
@@ -188,6 +243,8 @@ const Mailer = () => {
     } finally {
       setAuthLoading(false);
       setShowManualEntry(false);
+      setShowUrlInput(false);
+      setUrlInput("");
     }
   };
 
@@ -226,14 +283,43 @@ const Mailer = () => {
 
   // Show manual code entry dialog as fallback
   const showManualCodeEntry = () => {
-    const code = prompt(
-      "Please copy and paste the authorization code from the Google OAuth page:"
+    const input = prompt(
+      "Please copy and paste the full URL from the localhost page (or just the authorization code):"
     );
-    if (code && code.trim()) {
-      exchangeCodeForToken(code.trim());
+    if (input && input.trim()) {
+      let code = input.trim();
+
+      // If input looks like a URL, extract the code parameter
+      if (code.includes("localhost") || code.includes("code=")) {
+        try {
+          const url = new URL(
+            code.startsWith("http")
+              ? code
+              : "http://localhost:8080?" + code.split("?")[1]
+          );
+          const extractedCode = url.searchParams.get("code");
+          if (extractedCode) {
+            code = extractedCode;
+          }
+        } catch (error) {
+          // If URL parsing fails, try regex extraction
+          const codeMatch = code.match(/code=([^&]+)/);
+          if (codeMatch) {
+            code = codeMatch[1];
+          }
+        }
+      }
+
+      if (code && code.length > 10) {
+        // Basic validation for code length
+        exchangeCodeForToken(code);
+      } else {
+        setAuthLoading(false);
+        toast.error("Could not extract authorization code from input");
+      }
     } else {
       setAuthLoading(false);
-      toast.error("Authorization cancelled or invalid code entered");
+      toast.error("Authorization cancelled or invalid input");
     }
   };
 
@@ -347,11 +433,13 @@ const Mailer = () => {
           setAuthLoading(false);
           toast.error("Authentication timed out. Please try again.");
           // Show instructions immediately
-          toast.info("Complete authorization in the popup, then click 'Enter Code Manually' below.");
-          
+          toast.info(
+             "Complete authorization in the popup, then click 'Enter Code Manually' below."
+           );
+
           // Set a flag to show manual entry button
           setShowManualEntry(true);
-          
+
           // Auto-prompt after 5 seconds if still loading
           setTimeout(() => {
             if (authLoading && !refreshToken) {
@@ -422,8 +510,8 @@ const Mailer = () => {
         const hasHtmlTags = /<[^>]+>/g.test(content);
         if (!hasHtmlTags) {
           toast.warning(
-            "File doesn't appear to contain HTML tags. Proceeding anyway..."
-          );
+             "File doesn't appear to contain HTML tags. Proceeding anyway..."
+           );
         }
 
         setHtmlContent(content);
@@ -455,8 +543,8 @@ const Mailer = () => {
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast.error(
-        "File size too large. Please upload a CSV file smaller than 5MB"
-      );
+         "File size too large. Please upload a CSV file smaller than 5MB"
+       );
       return;
     }
 
@@ -527,8 +615,8 @@ const Mailer = () => {
 
         if (recipientObjects.length === 0) {
           toast.error(
-            "No valid email addresses found in CSV. Please ensure your CSV contains a column with valid email addresses."
-          );
+             "No valid email addresses found in CSV. Please ensure your CSV contains a column with valid email addresses."
+           );
           setCsvFile(null);
           setCsvHeaders([]);
           setRecipients([]);
@@ -539,24 +627,24 @@ const Mailer = () => {
         const maxRecipients = 1000;
         if (recipientObjects.length > maxRecipients) {
           toast.warning(
-            `Too many recipients (${recipientObjects.length}). Only the first ${maxRecipients} will be processed.`
-          );
+             `Too many recipients (${recipientObjects.length}). Only the first ${maxRecipients} will be processed.`
+           );
           setRecipients(recipientObjects.slice(0, maxRecipients));
         } else {
           setRecipients(recipientObjects);
         }
 
         toast.success(
-          `${Math.min(
-            recipientObjects.length,
-            maxRecipients
-          )} recipients loaded successfully`
-        );
+           `${Math.min(
+             recipientObjects.length,
+             maxRecipients
+           )} recipients loaded successfully`
+         );
       } catch (error) {
         console.error("CSV parsing error:", error);
         toast.error(
-          "Error parsing CSV file. Please check the format and try again."
-        );
+           "Error parsing CSV file. Please check the format and try again."
+         );
         setCsvFile(null);
         setCsvHeaders([]);
         setRecipients([]);
@@ -759,6 +847,12 @@ const Mailer = () => {
     ws.onclose = () => {
       setWsConnected(false);
       console.log("WebSocket disconnected");
+      toast.success("Sending complete!");
+      // toast({
+      //   title: "Sending completed",
+      //   description: "All emails are sent",
+      //   variant: "success",
+      // });
     };
 
     ws.onerror = (error) => {
@@ -838,8 +932,8 @@ const Mailer = () => {
 
       if (!state || !savedState) {
         toast.error(
-          "Authentication failed: Missing security verification parameter"
-        );
+           "Authentication failed: Missing security verification parameter"
+         );
         // Clean up the URL
         window.history.replaceState(
           {},
@@ -924,19 +1018,53 @@ const Mailer = () => {
                   >
                     {authLoading ? "Authorizing..." : "Authorize with Google"}
                   </Button>
-                  
-                  {showManualEntry && authLoading && (
+                </div>
+              )}
+
+              {/* Popup Notification */}
+              {showPopupNotification && (
+                <div className={styles.popupOverlay}>
+                  <div className={styles.popupContent}>
+                    <h3>📋 Copy URL Instructions</h3>
+                    <p>
+                      When you see the "localhost not reachable" page, copy the
+                      full URL from your browser's address bar.
+                    </p>
+                    <div className={styles.popupButtons}>
+                      <Button
+                        onClick={closePopupAndStartAuth}
+                        className={styles.button}
+                      >
+                        Got it, Continue
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* URL Input Section */}
+              {showUrlInput && !refreshToken && (
+                <div className={styles.urlInputSection}>
+                  <Label htmlFor="url-input">
+                    Enter URL from localhost page:
+                  </Label>
+                  <div className={styles.urlInputGroup}>
+                    <Input
+                      id="url-input"
+                      type="text"
+                      value={urlInput}
+                      onChange={(e) => setUrlInput(e.target.value)}
+                      placeholder="Paste the full URL here (e.g., http://localhost:8080/?code=...)"
+                      className={styles.urlInput}
+                    />
                     <Button
-                      onClick={() => {
-                        setShowManualEntry(false);
-                        showManualCodeEntry();
-                      }}
-                      variant="outline"
-                      className={styles.button}
+                      onClick={extractCodeFromUrl}
+                      disabled={!urlInput.trim()}
+                      className={styles.extractButton}
                     >
-                      Enter Code Manually
+                      Extract Code
                     </Button>
-                  )}
+                  </div>
                 </div>
               )}
 

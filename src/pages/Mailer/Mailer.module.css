@@ -11,8 +11,7 @@
 }
 
 .rightPanel {
-  flex: 0 0 650px;
-  max-width: 650px;
+  flex: 0 0 40%;
   background-color: #000;
   border-radius: 8px;
   overflow: hidden;
@@ -69,6 +68,78 @@
 .button {
   align-self: flex-start;
   margin-top: 0;
+}
+
+.popupOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popupContent {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+}
+
+.popupContent h3 {
+  margin: 0 0 1rem 0;
+  color: var(--black);
+  font-size: 1.25rem;
+}
+
+.popupContent p {
+  margin: 0 0 1.5rem 0;
+  color: var(--darkGrey);
+  line-height: 1.5;
+}
+
+.popupButtons {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.urlInputSection {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.urlInputSection label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--black);
+}
+
+.urlInputGroup {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+.urlInput {
+  flex: 1;
+  min-width: 0;
+}
+
+.extractButton {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .authSuccess {
