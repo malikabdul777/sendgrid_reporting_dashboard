@@ -22,7 +22,9 @@ import MIMEBuster from "./pages/MIMEBuster/MIMEBuster";
 
 function App() {
   return (
-    <div>
+    <div className="app-container">
+      {" "}
+      {/* Changed from plain div to add a class */}
       <BrowserRouter>
         <Routes>
           {/* Private Routes */}

@@ -26,9 +26,28 @@ html {
 .resetFontSize {
   font-size: 16px !important;
 }
+/* Add this after the existing body styles */
 body {
   font-family: "Poppins", sans-serif;
   font-size: 16px;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+html {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+.app-container {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
 }
 
 /* Helper classes */
@@ -155,8 +174,6 @@ input:disabled {
     @apply bg-background text-foreground;
   }
 }
-
-
 
 @layer base {
   * {

@@ -144,7 +144,7 @@ const HtmlPreview = ({ htmlPreview, setEmailTemplate }) => {
               <p>
                 No HTML content to preview. Please enter an email template.
                 {htmlPreview === undefined && " (htmlPreview is undefined)"}
-                {htmlPreview === "" && " (htmlPreview is empty string)"}
+                {/* {htmlPreview === "" && " (htmlPreview is empty string)"} */}
                 {htmlPreview &&
                   htmlPreview.trim() === "" &&
                   " (htmlPreview contains only whitespace)"}

@@ -42,21 +42,7 @@ const Layout = () => {
       {pathname === "/" && <Navigate to="/dashboard" />}
       <Sidebar />
       <div className={styles.dashboard}>
-        {/* <div className={styles.header}>
-          <p className={styles.heading}>SendGrid Reporting Dashboard</p>
-        </div> */}
         <div className={styles.outlet}>
-          {/* <div className={styles.dataLoadingContainer}>
-            <div className="simple-spinner">
-              <span></span>
-            </div>
-            <p className={styles.loadingText}>Data is being loaded...</p>
-          </div> */}
-
-          {/* <div className={styles.dataLoadingContainer}>
-            <MdOutlineWifiTetheringErrorRounded size={40} color={"#df6555"} />
-            <p className={styles.errorText}>Something went wrong...</p>
-          </div> */}
           <Outlet />
         </div>
       </div>

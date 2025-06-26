@@ -61,7 +61,7 @@ const Sidebar = () => {
                   pathname === "/domain-auth" ? styles.activeIcon : null
                 }`}
               />
-              <p className={styles.navLinkText}>Domain Auth</p>
+              <p className={styles.navLinkText}>TRM Domains</p>
             </div>
           </NavLink>
 
@@ -119,7 +119,7 @@ const Sidebar = () => {
             </div>
           </NavLink>
 
-          <NavLink
+          {/* <NavLink
             to="domain-logs"
             className={`${styles.navLink} ${
               pathname === "/domain-logs" ? styles.activeNavLink : null
@@ -135,9 +135,9 @@ const Sidebar = () => {
               />
               <p className={styles.navLinkText}>Domain Logs</p>
             </div>
-          </NavLink>
+          </NavLink> */}
 
-          <NavLink
+          {/* <NavLink
             to="spam-reporters"
             className={`${styles.navLink} ${
               pathname === "/spam-reporters" ? styles.activeNavLink : null
@@ -153,7 +153,7 @@ const Sidebar = () => {
               />
               <p className={styles.navLinkText}>Reporters</p>
             </div>
-          </NavLink>
+          </NavLink> */}
 
           {/* <NavLink
             to="webform-blocks-check"
