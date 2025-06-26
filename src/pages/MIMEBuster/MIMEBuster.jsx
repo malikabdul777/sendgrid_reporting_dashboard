@@ -282,10 +282,12 @@ function MIMEBuster() {
     reactToast.info("Form has been reset");
   };
 
-  const handleSaveConfig = (configName) => {
+  const handleSaveConfig = () => {
+    const configName = prompt("Enter configuration name:");
     if (!configName) return;
 
     const configToSave = {
+      id: Date.now(), // Add unique ID
       name: configName,
       data: watch(),
       attachments: selectedAttachments,
@@ -298,8 +300,7 @@ function MIMEBuster() {
     reactToast.success(`Configuration "${configName}" saved successfully`);
   };
 
-  const handleLoadConfig = (configIndex) => {
-    const config = savedConfigs[configIndex];
+  const handleLoadConfig = (config) => {
     if (!config) return;
 
     reset(config.data);
@@ -386,7 +387,7 @@ function MIMEBuster() {
         <Button
           variant="outline"
           className={styles.actionButton}
-          onClick={handleSaveConfig}
+          onClick={handleSaveConfig} // This is now correct - no event parameter
         >
           <Save className="mr-2 h-4 w-4" /> Save Config
         </Button>

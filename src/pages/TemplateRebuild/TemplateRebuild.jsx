@@ -54,42 +54,49 @@ const TemplateRebuild = () => {
     randomizeClassNames: true,
   });
 
-  // Extract HTML content whenever the email template changes
+  // Robust HTML extraction
   useEffect(() => {
     if (!emailTemplate) {
       setHtmlPreview("");
       setOriginalHtml("");
       return;
     }
-
-    // Extract content from DOCTYPE to end of HTML
-    const docTypeRegex = /<!DOCTYPE[^>]*>[\s\S]*?<\/html>/i;
-    const match = emailTemplate.match(docTypeRegex);
-
-    let extractedHtml = "";
-    if (match) {
-      extractedHtml = match[0];
+  
+    // Preserve the complete HTML structure without truncation
+    // Instead of trying to extract parts, we'll work with the entire template
+    let processedHtml = emailTemplate;
+    
+    // Only wrap in HTML structure if it doesn't already have HTML tags
+    if (!processedHtml.trim().toLowerCase().includes("<!doctype") && 
+        !processedHtml.trim().toLowerCase().includes("<html")) {
+    
+    // Check if it has a body tag
+    const hasBodyTag = /<body[^>]*>[\s\S]*?<\/body>/i.test(processedHtml);
+    
+    if (hasBodyTag) {
+      // Extract body content and wrap in proper HTML
+      const bodyContent = processedHtml.match(/<body[^>]*>([\s\S]*?)<\/body>/i)?.[1] || processedHtml;
+      processedHtml = `<!DOCTYPE html>\n<html>\n<head>\n  <meta charset="UTF-8">\n  <title>Email Template</title>\n</head>\n<body>\n${bodyContent}\n</body>\n</html>`;
+    } else if (!processedHtml.trim().startsWith("<")) {
+      // Plain text content
+      processedHtml = `<!DOCTYPE html>\n<html>\n<head>\n  <meta charset="UTF-8">\n  <title>Email Template</title>\n</head>\n<body>\n${processedHtml}\n</body>\n</html>`;
     } else {
-      // If no DOCTYPE, try to extract just the HTML part
-      const htmlRegex = /<html[\s\S]*?<\/html>/i;
-      const htmlMatch = emailTemplate.match(htmlRegex);
-      extractedHtml = htmlMatch ? htmlMatch[0] : "";
+      // HTML fragments without proper structure
+      processedHtml = `<!DOCTYPE html>\n<html>\n<head>\n  <meta charset="UTF-8">\n  <title>Email Template</title>\n</head>\n<body>\n${processedHtml}\n</body>\n</html>`;
     }
+  }
 
-    setOriginalHtml(extractedHtml);
-    setHtmlPreview(extractedHtml);
-  }, [emailTemplate]);
+  console.log("Processed HTML length:", processedHtml.length);
+  setOriginalHtml(processedHtml);
+  setHtmlPreview(processedHtml);
+}, [emailTemplate]);
 
   // Update preview when replacement colors change
   useEffect(() => {
     if (!originalHtml || Object.keys(replacementColors).length === 0) return;
-
     let updatedHtml = originalHtml;
-
-    // Replace colors in a way that preserves the HTML structure
     Object.entries(replacementColors).forEach(([originalColor, newColor]) => {
       if (newColor && originalColor !== newColor) {
-        // Create a regex that targets colors in style attributes and CSS rules
         const safeColorRegex = new RegExp(
           `(color:|background(-color)?:|border(-color)?:|fill:|stroke:|\\s+)${originalColor.replace(
             /[.*+?^${}()|[\]\\]/g,
@@ -97,7 +104,6 @@ const TemplateRebuild = () => {
           )}(\\s|;|,|\\)|$)`,
           "g"
         );
-
         updatedHtml = updatedHtml.replace(
           safeColorRegex,
           (match, prefix, _, __, suffix) => {
@@ -106,7 +112,6 @@ const TemplateRebuild = () => {
         );
       }
     });
-
     setHtmlPreview(updatedHtml);
   }, [replacementColors, originalHtml]);
 

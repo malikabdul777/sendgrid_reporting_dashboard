@@ -2,6 +2,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { IoCopyOutline } from "react-icons/io5";
 import Editor from "@monaco-editor/react";
+import { useCallback, useRef } from "react";
+import { debounce } from "lodash";
 
 const TemplateInput = ({
   emailTemplate,
@@ -11,110 +13,25 @@ const TemplateInput = ({
   extractedColors,
   handleCopyToClipboard,
 }) => {
-  // Function to format HTML code with special handling for email headers
-  const formatCode = () => {
-    if (!emailTemplate) return;
+  const editorRef = useRef(null);
 
-    // Split the template into headers and HTML content
-    const lines = emailTemplate.split("\n");
-    let headerLines = [];
-    let htmlLines = [];
-    let foundDoctype = false;
-
-    // Separate headers from HTML content
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (
-        !foundDoctype &&
-        (line.toLowerCase().includes("<!doctype") ||
-          line.toLowerCase().includes("<html"))
-      ) {
-        foundDoctype = true;
-      }
-
-      if (foundDoctype) {
-        htmlLines.push(line);
-      } else {
-        headerLines.push(line);
-      }
-    }
-
-    // Format only the HTML part
-    let formattedHtml = "";
-    if (htmlLines.length > 0) {
-      // Create a temporary DOM element
-      const tempDiv = document.createElement("div");
-      tempDiv.innerHTML = htmlLines.join("\n").trim();
-
-      // Format the HTML with proper indentation
-      formattedHtml = formatHTML(tempDiv);
-    }
-
-    // Combine headers (unindented) with formatted HTML
-    const formattedTemplate =
-      headerLines.join("\n") +
-      (headerLines.length > 0 && formattedHtml ? "\n\n" : "") +
-      formattedHtml;
-
-    setEmailTemplate(formattedTemplate);
+  // Store editor reference when it's mounted
+  const handleEditorDidMount = (editor) => {
+    editorRef.current = editor;
   };
 
-  // Helper function to format HTML with proper indentation
-  const formatHTML = (node, level = 0) => {
-    const indentBefore = new Array(level++ + 1).join("  ");
-    const indentAfter = new Array(level - 1).join("  ");
-    let textNode;
-
-    let html = "";
-
-    // Special handling for DOCTYPE and HTML tags at the root level
-    if (node.nodeType === 9) {
-      // DOCUMENT_NODE
-      const doctype = node.doctype;
-      if (doctype) {
-        html += "<!DOCTYPE " + doctype.name + ">\n";
-      }
-
-      if (node.documentElement) {
-        html += formatHTML(node.documentElement, 0);
-      }
-
-      return html;
-    }
-
-    // Format regular HTML elements
-    if (node.nodeType === 1) {
-      // ELEMENT_NODE
-      html += indentBefore + "<" + node.nodeName.toLowerCase();
-
-      // Add attributes
-      for (let i = 0; i < node.attributes.length; i++) {
-        const attr = node.attributes[i];
-        html += " " + attr.name + '="' + attr.value + '"';
-      }
-
-      html += ">";
-
-      // Add content or recursively format child elements
-      if (node.children.length > 0) {
-        html += "\n";
-        for (let i = 0; i < node.children.length; i++) {
-          html += formatHTML(node.children[i], level);
-        }
-        html += indentBefore;
+  // Debounced update with improved handling for large HTML
+  const debouncedSetEmailTemplate = useCallback(
+    debounce((value) => {
+      // Ensure we're not truncating or modifying the HTML structure
+      if (value) {
+        setEmailTemplate(value);
       } else {
-        const content = node.textContent.trim();
-        if (content) {
-          html += content;
-        }
+        setEmailTemplate("");
       }
-
-      // Closing tag
-      html += "</" + node.nodeName.toLowerCase() + ">\n";
-    }
-
-    return html;
-  };
+    }, 500),
+    [setEmailTemplate]
+  );
 
   return (
     <div className="space-y-2 mb-4">
@@ -127,44 +44,52 @@ const TemplateInput = ({
             height="600px"
             defaultLanguage="html"
             value={emailTemplate}
-            onChange={setEmailTemplate}
+            onChange={debouncedSetEmailTemplate}
+            onMount={handleEditorDidMount}
             options={{
               minimap: { enabled: false },
               scrollBeyondLastLine: false,
               fontSize: 14,
               wordWrap: "on",
-              formatOnPaste: false, // Disabled automatic formatting
-              formatOnType: false, // Disabled automatic formatting
-              autoIndent: "none", // Disabled automatic indentation
+              formatOnPaste: false,
+              formatOnType: false,
+              autoIndent: "none",
               tabSize: 2,
+              lineNumbers: "on",
+              folding: true,
+              renderWhitespace: "all",
+              detectIndentation: false,
+              // Prevent Monaco from auto-formatting or stripping content
+              trimAutoWhitespace: false,
+              autoClosingBrackets: "never",
+              autoClosingQuotes: "never",
+              matchBrackets: "never",
+              matchOverviewRuler: false,
+              // Allow large files
+              largeFileOptimizations: false,
+              scrollbar: { vertical: "visible", horizontal: "visible" },
+              // Increase performance for large files
+              wordBasedSuggestions: false,
+              // Disable auto-formatting which can cause truncation
+              formatOnSave: false,
+              // Increase editor performance
+              renderLineHighlight: "none",
+              // Disable validation which can be slow for large HTML
+              html: {
+                format: {
+                  enable: false,
+                },
+                validate: {
+                  scripts: false,
+                  styles: false,
+                },
+              },
+              // Increase max tokenization line count
+              "editor.maxTokenizationLineLength": 100000,
             }}
           />
         </div>
         <div className="absolute bottom-8 right-6 flex gap-2">
-          {/* <button
-            onClick={formatCode}
-            className="p-2 bg-white rounded-lg shadow-md hover:bg-gray-100 transition-colors"
-            aria-label="Format code"
-            title="Format code"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="text-gray-600"
-            >
-              <path d="M21 10H3" />
-              <path d="M21 6H3" />
-              <path d="M21 14H3" />
-              <path d="M21 18H3" />
-            </svg>
-          </button> */}
           {emailTemplate && (
             <button
               onClick={handleCopyToClipboard}
