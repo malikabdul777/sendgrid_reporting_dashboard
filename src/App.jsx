@@ -19,6 +19,7 @@ import TemplateBuilder from "./pages/TemplateBuilder/TemplateBuilder";
 import TemplateRebuild from "./pages/TemplateRebuild/TemplateRebuild";
 // Make sure this import is correct
 import MIMEBuster from "./pages/MIMEBuster/MIMEBuster";
+import Mailer from "./pages/Mailer/Mailer";
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
             <Route path="webform-blocks-check" element={<WebformBlocks />} />
             <Route path="template-rebuild" element={<TemplateRebuild />} />
             <Route path="MIME-buster" element={<MIMEBuster />} />
+            <Route path="Mailer" element={<Mailer />} />
             {/* Fallback Route */}
             <Route path="*" element={<Navigate to="/domain-auth" />} />
           </Route>

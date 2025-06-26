@@ -10,6 +10,7 @@ import { GoShieldLock } from "react-icons/go";
 import { FiEdit } from "react-icons/fi";
 import { IoBuild } from "react-icons/io5";
 import { GiMagickTrick } from "react-icons/gi";
+import { IoIosMail } from "react-icons/io";
 
 // Utils
 
@@ -116,6 +117,24 @@ const Sidebar = () => {
                 }`}
               />
               <p className={styles.navLinkText}>Template Reb</p>
+            </div>
+          </NavLink>
+
+          <NavLink
+            to="mailer"
+            className={`${styles.navLink} ${
+              pathname === "/mailer" ? styles.activeNavLink : null
+            }`}
+            title={"Mailer"}
+          >
+            <div className={styles.item}>
+              <IoIosMail
+                size={20}
+                className={`${
+                  pathname === "/mailer" ? styles.activeIcon : null
+                }`}
+              />
+              <p className={styles.navLinkText}>Mailer</p>
             </div>
           </NavLink>
 
