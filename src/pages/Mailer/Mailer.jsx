@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,7 @@ const Mailer = () => {
   const [refreshToken, setRefreshToken] = useState(null);
   const [accessToken, setAccessToken] = useState(null);
   const [authLoading, setAuthLoading] = useState(false);
+  const [showManualEntry, setShowManualEntry] = useState(false);
 
   // State for email content and recipients
   const [htmlContent, setHtmlContent] = useState(null);
@@ -150,6 +151,7 @@ const Mailer = () => {
     }
 
     setAuthLoading(true);
+    setShowManualEntry(true);
     initiateOAuthFlow();
   };
 
@@ -166,7 +168,7 @@ const Mailer = () => {
           client_secret: oauthCredentials.client_secret,
           code: authCode,
           grant_type: "authorization_code",
-          redirect_uri: "urn:ietf:wg:oauth:2.0:oob",
+          redirect_uri: "http://localhost:8080",
         }),
       });
 
@@ -185,6 +187,7 @@ const Mailer = () => {
       toast.error("Failed to exchange authorization code for token");
     } finally {
       setAuthLoading(false);
+      setShowManualEntry(false);
     }
   };
 
@@ -224,11 +227,7 @@ const Mailer = () => {
   // Show manual code entry dialog as fallback
   const showManualCodeEntry = () => {
     const code = prompt(
-      "Google should have displayed an authorization code in the popup window.\n\n" +
-      "Please look for a page that says 'Please copy this code' or similar, " +
-      "and copy the authorization code displayed there.\n\n" +
-      "The code will look like: 4/0AX4XfWh...\n\n" +
-      "Paste the authorization code below:"
+      "Please copy and paste the authorization code from the Google OAuth page:"
     );
     if (code && code.trim()) {
       exchangeCodeForToken(code.trim());
@@ -238,7 +237,7 @@ const Mailer = () => {
     }
   };
 
-  // Initiate OAuth flow with out-of-band redirect URI for manual code entry
+  // Initiate OAuth flow with localhost redirect URI and popup monitoring
   const initiateOAuthFlow = () => {
     if (!oauthCredentials || !oauthCredentials.client_id) {
       toast.error("OAuth credentials are invalid or missing client_id");
@@ -248,14 +247,20 @@ const Mailer = () => {
 
     const { client_id } = oauthCredentials;
 
-    // Use out-of-band flow - Google will display the code directly
-    const redirectUri = encodeURIComponent("urn:ietf:wg:oauth:2.0:oob");
+    // Create a unique state parameter to verify the response
+    const state = Math.random().toString(36).substring(2, 15);
+
+    // Store state in sessionStorage to verify later
+    sessionStorage.setItem("oauth_state", state);
+
+    // Use hardcoded localhost redirect URI that should work without Google Console changes
+    const redirectUri = encodeURIComponent("http://localhost:8080");
     const scope = encodeURIComponent("https://mail.google.com/");
     const responseType = "code";
     const accessType = "offline";
     const prompt = "consent";
 
-    const authUrl = `https://accounts.google.com/o/oauth2/auth?client_id=${client_id}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}&access_type=${accessType}&prompt=${prompt}`;
+    const authUrl = `https://accounts.google.com/o/oauth2/auth?client_id=${client_id}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}&access_type=${accessType}&prompt=${prompt}&state=${state}`;
 
     // Open OAuth in a popup window
     const popupWidth = 800;
@@ -269,6 +274,97 @@ const Mailer = () => {
       `width=${popupWidth},height=${popupHeight},left=${left},top=${top},resizable,scrollbars=yes,status=1`
     );
 
+    // Monitor popup window for URL changes to detect redirect
+    const monitorPopup = () => {
+      const checkInterval = setInterval(() => {
+        try {
+          if (authWindow.closed) {
+            clearInterval(checkInterval);
+            setAuthLoading(false);
+            toast.error("Authentication window was closed");
+            return;
+          }
+
+          // Try to access the popup URL
+          let popupUrl;
+          try {
+            popupUrl = authWindow.location.href;
+          } catch (e) {
+            // Cross-origin error means we're still on Google's domain
+            return;
+          }
+
+          // Check if we've been redirected to localhost (success or error)
+          if (popupUrl && popupUrl.includes("localhost:8080")) {
+            clearInterval(checkInterval);
+
+            // Parse URL for authorization code or error
+            const urlParams = new URLSearchParams(new URL(popupUrl).search);
+            const code = urlParams.get("code");
+            const error = urlParams.get("error");
+            const returnedState = urlParams.get("state");
+
+            // Verify state parameter
+            const savedState = sessionStorage.getItem("oauth_state");
+            if (returnedState !== savedState) {
+              toast.error("Authentication failed: Invalid state parameter");
+              setAuthLoading(false);
+              authWindow.close();
+              return;
+            }
+
+            // Clear the state from storage
+            sessionStorage.removeItem("oauth_state");
+
+            if (code) {
+              // Success - exchange code for tokens
+              authWindow.close();
+              exchangeCodeForToken(code);
+            } else if (error) {
+              // Error from Google
+              authWindow.close();
+              toast.error(`Authentication failed: ${error}`);
+              setAuthLoading(false);
+            } else {
+              // Unexpected redirect
+              authWindow.close();
+              toast.error("Authentication failed: Unexpected redirect");
+              setAuthLoading(false);
+            }
+          }
+        } catch (e) {
+          // Ignore cross-origin errors while on Google's domain
+        }
+      }, 1000);
+
+      // Cleanup after 5 minutes
+      setTimeout(() => {
+        clearInterval(checkInterval);
+        if (!authWindow.closed) {
+          authWindow.close();
+        }
+        if (!refreshToken) {
+          setAuthLoading(false);
+          toast.error("Authentication timed out. Please try again.");
+          // Show instructions immediately
+          toast.info("Complete authorization in the popup, then click 'Enter Code Manually' below.");
+          
+          // Set a flag to show manual entry button
+          setShowManualEntry(true);
+          
+          // Auto-prompt after 5 seconds if still loading
+          setTimeout(() => {
+            if (authLoading && !refreshToken) {
+              showManualCodeEntry();
+            }
+          }, 5000);
+        }
+      }, 300000); // 5 minutes
+    };
+
+    // Start monitoring the popup
+    monitorPopup();
+
     // Check if popup was blocked
     if (
       !authWindow ||
@@ -278,15 +374,15 @@ const Mailer = () => {
       toast.error("Popup was blocked. Opening OAuth page in new tab instead.");
       // Fallback: open in new tab
       window.open(authUrl, "_blank");
+      // Show manual code entry dialog
+      setTimeout(() => {
+        showManualCodeEntry();
+      }, 1000);
+      return;
     }
 
-    // Show instructions and prompt for manual code entry
-    toast.info("Please complete the authorization in the popup window, then copy the code.");
-    
-    // Wait a moment for user to see the popup, then show code entry
-    setTimeout(() => {
-      showManualCodeEntry();
-    }, 3000);
+    // Focus the popup
+    authWindow.focus();
   };
 
   // Handle HTML file upload with enhanced validation
@@ -820,13 +916,28 @@ const Mailer = () => {
               )}
 
               {oauthCredentials && !refreshToken && (
-                <Button
-                  onClick={handleAuthorize}
-                  disabled={authLoading || isSending}
-                  className={styles.button}
-                >
-                  {authLoading ? "Authorizing..." : "Authorize with Google"}
-                </Button>
+                <div className={styles.buttonGroup}>
+                  <Button
+                    onClick={handleAuthorize}
+                    disabled={authLoading || isSending}
+                    className={styles.button}
+                  >
+                    {authLoading ? "Authorizing..." : "Authorize with Google"}
+                  </Button>
+                  
+                  {showManualEntry && authLoading && (
+                    <Button
+                      onClick={() => {
+                        setShowManualEntry(false);
+                        showManualCodeEntry();
+                      }}
+                      variant="outline"
+                      className={styles.button}
+                    >
+                      Enter Code Manually
+                    </Button>
+                  )}
+                </div>
               )}
 
               {refreshToken && (
