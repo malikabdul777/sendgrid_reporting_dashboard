@@ -166,7 +166,7 @@ const Mailer = () => {
           client_secret: oauthCredentials.client_secret,
           code: authCode,
           grant_type: "authorization_code",
-          redirect_uri: `${window.location.origin}/Mailer`,
+          redirect_uri: "http://localhost:8080",
         }),
       });
 
@@ -221,11 +221,24 @@ const Mailer = () => {
     }
   };
 
-  // Initiate OAuth flow by constructing Google OAuth URL and opening in popup
+  // Show manual code entry dialog as fallback
+  const showManualCodeEntry = () => {
+    const code = prompt(
+      "Please copy and paste the authorization code from the Google OAuth page:"
+    );
+    if (code && code.trim()) {
+      exchangeCodeForToken(code.trim());
+    } else {
+      setAuthLoading(false);
+      toast.error("Authorization cancelled or invalid code entered");
+    }
+  };
+
+  // Initiate OAuth flow with localhost redirect URI and popup monitoring
   const initiateOAuthFlow = () => {
     if (!oauthCredentials || !oauthCredentials.client_id) {
       toast.error("OAuth credentials are invalid or missing client_id");
-      setAuthCheckLoading(false);
+      setAuthLoading(false);
       return;
     }
 
@@ -237,8 +250,8 @@ const Mailer = () => {
     // Store state in sessionStorage to verify later
     sessionStorage.setItem("oauth_state", state);
 
-    // Construct the OAuth URL with correct Gmail scope
-    const redirectUri = encodeURIComponent(`${window.location.origin}/Mailer`);
+    // Use hardcoded localhost redirect URI that should work without Google Console changes
+    const redirectUri = encodeURIComponent("http://localhost:8080");
     const scope = encodeURIComponent("https://mail.google.com/");
     const responseType = "code";
     const accessType = "offline";
@@ -258,59 +271,94 @@ const Mailer = () => {
       `width=${popupWidth},height=${popupHeight},left=${left},top=${top},resizable,scrollbars=yes,status=1`
     );
 
-    // Set up message listener to receive the auth result from popup
-    const authMessageListener = (event) => {
-      // Verify origin for security
-      if (event.origin !== window.location.origin) {
-        return;
-      }
-
-      // Check if the message contains auth data
-      if (event.data && event.data.type === "oauth_callback") {
-        // Remove the event listener to avoid memory leaks
-        window.removeEventListener("message", authMessageListener);
-
-        // Verify state parameter to prevent CSRF attacks
-        const savedState = sessionStorage.getItem("oauth_state");
-
-        if (!event.data.state || !savedState) {
-          toast.error(
-            "Authentication failed: Missing security verification parameter"
-          );
-          setAuthCheckLoading(false);
-          return;
-        }
-
-        if (event.data.state !== savedState) {
-          toast.error("Authentication failed: Invalid state parameter");
-          setAuthCheckLoading(false);
-          return;
-        }
-
-        // Clear the state from storage
-        sessionStorage.removeItem("oauth_state");
-
-        // Process the auth result
-        if (event.data.success && event.data.code) {
-          // Exchange authorization code for refresh token
-          if (!oauthCredentials || !oauthCredentials.user_email) {
-            toast.error(
-              "Authentication failed: Missing user email in credentials"
-            );
+    // Monitor popup window for URL changes to detect redirect
+    const monitorPopup = () => {
+      const checkInterval = setInterval(() => {
+        try {
+          if (authWindow.closed) {
+            clearInterval(checkInterval);
             setAuthLoading(false);
+            toast.error("Authentication window was closed");
             return;
           }
-          exchangeCodeForToken(event.data.code);
-        } else {
-          toast.error(
-            "Authentication failed: " + (event.data.error || "Unknown error")
-          );
-          setAuthLoading(false);
+
+          // Try to access the popup URL
+          let popupUrl;
+          try {
+            popupUrl = authWindow.location.href;
+          } catch (e) {
+            // Cross-origin error means we're still on Google's domain
+            return;
+          }
+
+          // Check if we've been redirected to localhost (success or error)
+          if (popupUrl && popupUrl.includes("localhost:8080")) {
+            clearInterval(checkInterval);
+
+            // Parse URL for authorization code or error
+            const urlParams = new URLSearchParams(new URL(popupUrl).search);
+            const code = urlParams.get("code");
+            const error = urlParams.get("error");
+            const returnedState = urlParams.get("state");
+
+            // Verify state parameter
+            const savedState = sessionStorage.getItem("oauth_state");
+            if (returnedState !== savedState) {
+              toast.error("Authentication failed: Invalid state parameter");
+              setAuthLoading(false);
+              authWindow.close();
+              return;
+            }
+
+            // Clear the state from storage
+            sessionStorage.removeItem("oauth_state");
+
+            if (code) {
+              // Success - exchange code for tokens
+              authWindow.close();
+              exchangeCodeForToken(code);
+            } else if (error) {
+              // Error from Google
+              authWindow.close();
+              toast.error(`Authentication failed: ${error}`);
+              setAuthLoading(false);
+            } else {
+              // Unexpected redirect
+              authWindow.close();
+              toast.error("Authentication failed: Unexpected redirect");
+              setAuthLoading(false);
+            }
+          }
+        } catch (e) {
+          // Ignore cross-origin errors while on Google's domain
         }
-      }
+      }, 1000);
+
+      // Cleanup after 5 minutes
+      setTimeout(() => {
+        clearInterval(checkInterval);
+        if (!authWindow.closed) {
+          authWindow.close();
+        }
+        if (!refreshToken) {
+          setAuthLoading(false);
+          toast.error("Authentication timed out. Please try again.");
+          // Offer manual code entry as fallback
+          setTimeout(() => {
+            if (
+              confirm(
+                "Would you like to manually enter the authorization code instead?"
+              )
+            ) {
+              showManualCodeEntry();
+            }
+          }, 1000);
+        }
+      }, 300000); // 5 minutes
     };
 
-    window.addEventListener("message", authMessageListener);
+    // Start monitoring the popup
+    monitorPopup();
 
     // Check if popup was blocked
     if (
@@ -318,33 +366,18 @@ const Mailer = () => {
       authWindow.closed ||
       typeof authWindow.closed === "undefined"
     ) {
-      toast.error(
-        "Popup was blocked by your browser. Please allow popups for this site."
-      );
-      setAuthCheckLoading(false);
+      toast.error("Popup was blocked. Opening OAuth page in new tab instead.");
+      // Fallback: open in new tab
+      window.open(authUrl, "_blank");
+      // Show manual code entry dialog
+      setTimeout(() => {
+        showManualCodeEntry();
+      }, 1000);
       return;
     }
 
     // Focus the popup
     authWindow.focus();
-
-    // Set a timer to check if the popup is still open
-    const checkPopupInterval = setInterval(() => {
-      if (authWindow.closed) {
-        clearInterval(checkPopupInterval);
-        window.removeEventListener("message", authMessageListener);
-        setAuthLoading(false);
-      }
-    }, 1000);
-
-    // Clean up the interval after 5 minutes (failsafe)
-    setTimeout(() => {
-      clearInterval(checkPopupInterval);
-      window.removeEventListener("message", authMessageListener);
-      if (!refreshToken) {
-        setAuthLoading(false);
-      }
-    }, 300000); // 5 minutes
   };
 
   // Handle HTML file upload with enhanced validation
