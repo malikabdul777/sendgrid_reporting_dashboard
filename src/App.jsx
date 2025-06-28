@@ -20,6 +20,7 @@ import TemplateRebuild from "./pages/TemplateRebuild/TemplateRebuild";
 // Make sure this import is correct
 import MIMEBuster from "./pages/MIMEBuster/MIMEBuster";
 import Mailer from "./pages/Mailer/Mailer";
+import GmailHelper from "./pages/Tools/GmailHelper/GmailHelper";
 
 function App() {
   return (
@@ -38,6 +39,8 @@ function App() {
             <Route path="template-rebuild" element={<TemplateRebuild />} />
             <Route path="MIME-buster" element={<MIMEBuster />} />
             <Route path="Mailer" element={<Mailer />} />
+            <Route path="tools/gmail-helper" element={<GmailHelper />} />
+
             {/* Fallback Route */}
             <Route path="*" element={<Navigate to="/domain-auth" />} />
           </Route>

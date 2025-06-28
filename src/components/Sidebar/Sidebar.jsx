@@ -1,9 +1,10 @@
 // React
+import { useState } from "react";
 
 // Thirdparty
 import { NavLink } from "react-router-dom";
 import { GoHomeFill } from "react-icons/go";
-import { FaListUl } from "react-icons/fa";
+import { FaListUl, FaTools } from "react-icons/fa";
 import { BsDatabase } from "react-icons/bs";
 import { useLocation } from "react-router-dom";
 import { GoShieldLock } from "react-icons/go";
@@ -11,6 +12,8 @@ import { FiEdit } from "react-icons/fi";
 import { IoBuild } from "react-icons/io5";
 import { GiMagickTrick } from "react-icons/gi";
 import { IoIosMail } from "react-icons/io";
+import { MdExpandMore, MdExpandLess } from "react-icons/md";
+import { SiGmail } from "react-icons/si";
 
 // Utils
 
@@ -39,6 +42,7 @@ import styles from "./Sidebar.module.css";
 
 const Sidebar = () => {
   const { pathname } = useLocation();
+  const [isToolsExpanded, setIsToolsExpanded] = useState(false);
 
   // console.log(Cookies.get());
 
@@ -137,6 +141,52 @@ const Sidebar = () => {
               <p className={styles.navLinkText}>Mailer</p>
             </div>
           </NavLink>
+
+          {/* Tools Dropdown */}
+          <div className={styles.dropdownContainer}>
+            <div
+              className={`${styles.navLink} ${
+                pathname.startsWith("/tools") ? styles.activeNavLink : null
+              }`}
+              onClick={() => setIsToolsExpanded(!isToolsExpanded)}
+              title={"Tools"}
+            >
+              <div className={styles.item}>
+                <FaTools
+                  size={16}
+                  className={`${
+                    pathname.startsWith("/tools") ? styles.activeIcon : null
+                  }`}
+                />
+                <p className={styles.navLinkText}>Tools</p>
+                {isToolsExpanded ? (
+                 <MdExpandLess size={16} className={`${styles.expandIcon} ${styles.rotated}`} />
+               ) : (
+                 <MdExpandMore size={16} className={styles.expandIcon} />
+               )}
+              </div>
+            </div>
+
+            <div className={`${styles.submenu} ${isToolsExpanded ? styles.expanded : ''}`}>
+                <NavLink
+                  to="tools/gmail-helper"
+                  className={`${styles.submenuLink} ${
+                    pathname === "/tools/gmail-helper" ? styles.activeSubmenuLink : null
+                  }`}
+                  title={"Gmail Helper"}
+                >
+                  <div className={styles.submenuItem}>
+                     <SiGmail
+                       size={14}
+                       className={`${
+                         pathname === "/tools/gmail-helper" ? styles.activeIcon : null
+                       }`}
+                     />
+                     <p className={styles.submenuText}>Gmail Helper</p>
+                   </div>
+                 </NavLink>
+               </div>
+          </div>
 
           {/* <NavLink
             to="domain-logs"
