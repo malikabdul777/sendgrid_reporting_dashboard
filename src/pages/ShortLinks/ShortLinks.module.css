@@ -3,6 +3,7 @@
   padding: 24px;
   max-width: 1200px;
   margin: 0 auto;
+  margin-top: 30px;
 }
 
 /* Header */
@@ -26,11 +27,11 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #3b82f6;
+  background: #000000;
   color: white;
   border: none;
   border-radius: 8px;
-  padding: 12px 20px;
+  padding: 8px 12px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -107,8 +108,12 @@
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Table */
@@ -137,13 +142,27 @@
   white-space: nowrap;
 }
 
-.table th:nth-child(1) { width: 20%; } /* Title */
-.table th:nth-child(2) { width: 25%; } /* Short URL */
-.table th:nth-child(3) { width: 30%; } /* Original URL */
-.table th:nth-child(4) { width: 8%; }  /* Clicks */
-.table th:nth-child(5) { width: 8%; }  /* Status */
-.table th:nth-child(6) { width: 12%; } /* Created */
-.table th:nth-child(7) { width: 7%; }  /* Actions */
+.table th:nth-child(1) {
+  width: 20%;
+} /* Title */
+.table th:nth-child(2) {
+  width: 25%;
+} /* Short URL */
+.table th:nth-child(3) {
+  width: 30%;
+} /* Original URL */
+.table th:nth-child(4) {
+  width: 8%;
+} /* Clicks */
+.table th:nth-child(5) {
+  width: 8%;
+} /* Status */
+.table th:nth-child(6) {
+  width: 12%;
+} /* Created */
+.table th:nth-child(7) {
+  width: 7%;
+} /* Actions */
 
 .table td {
   padding: 16px;
@@ -194,7 +213,7 @@
 }
 
 .shortUrl {
-  font-family: 'Monaco', 'Menlo', monospace;
+  font-family: "Monaco", "Menlo", monospace;
   font-size: 13px;
   color: #3b82f6;
   background: #eff6ff;
@@ -323,7 +342,7 @@
 
 .urlText {
   flex: 1;
-  font-family: 'Monaco', 'Menlo', monospace;
+  font-family: "Monaco", "Menlo", monospace;
   font-size: 13px;
   color: #3b82f6;
   word-break: break-all;
@@ -632,33 +651,33 @@
   .container {
     padding: 16px;
   }
-  
+
   .header {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .controls {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .sortContainer {
     justify-content: flex-start;
   }
-  
+
   .tableContainer {
     overflow-x: auto;
   }
-  
+
   .table {
     min-width: 800px;
   }
-  
+
   .formActions {
     flex-direction: column;
   }
-  
+
   .modal {
     margin: 10px;
     max-width: none;
@@ -669,12 +688,12 @@
   .header h1 {
     font-size: 24px;
   }
-  
+
   .table th,
   .table td {
     padding: 12px 8px;
   }
-  
+
   .originalUrlCell {
     max-width: 200px;
   }

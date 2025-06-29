@@ -218,14 +218,14 @@ const ShortLinks = () => {
             <option value="title">Title</option>
           </select>
 
-          <select
+          {/* <select
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value)}
             className={styles.sortSelect}
           >
             <option value="desc">Descending</option>
             <option value="asc">Ascending</option>
-          </select>
+          </select> */}
         </div>
       </div>
 
@@ -325,11 +325,17 @@ const ShortLinks = () => {
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleViewDetails(link)}>
+                          <DropdownMenuItem
+                            onClick={() => handleViewDetails(link)}
+                          >
                             <FiEye size={14} />
                             View Details
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleCopyUrl(link?.shortLinkURL || "")}>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              handleCopyUrl(link?.shortLinkURL || "")
+                            }
+                          >
                             <FiCopy size={14} />
                             Copy URL
                           </DropdownMenuItem>
@@ -338,7 +344,7 @@ const ShortLinks = () => {
                             <FiEdit2 size={14} />
                             Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             onClick={() => handleDelete(link?.shortCode || "")}
                             className={styles.deleteMenuItem}
                           >
@@ -523,7 +529,9 @@ const ShortLinks = () => {
                 <div className={styles.detailItem}>
                   <label>Short URL:</label>
                   <div className={styles.urlWithCopy}>
-                    <span className={styles.urlText}>{selectedLink.shortLinkURL}</span>
+                    <span className={styles.urlText}>
+                      {selectedLink.shortLinkURL}
+                    </span>
                     <button
                       onClick={() => handleCopyUrl(selectedLink.shortLinkURL)}
                       className={styles.copyButton}
@@ -536,7 +544,9 @@ const ShortLinks = () => {
                 <div className={styles.detailItem}>
                   <label>Original URL:</label>
                   <div className={styles.urlWithCopy}>
-                    <span className={styles.urlText}>{selectedLink.targetURL}</span>
+                    <span className={styles.urlText}>
+                      {selectedLink.targetURL}
+                    </span>
                     <a
                       href={selectedLink.targetURL}
                       target="_blank"
@@ -550,12 +560,23 @@ const ShortLinks = () => {
                 </div>
                 <div className={styles.detailItem}>
                   <label>Clicks:</label>
-                  <span className={styles.clickCount}>{selectedLink.clicks || 0}</span>
+                  <span className={styles.clickCount}>
+                    {selectedLink.clicks || 0}
+                  </span>
                 </div>
                 <div className={styles.detailItem}>
                   <label>Status:</label>
-                  <span className={`${styles.status} ${selectedLink.status === 'active' ? styles.active : styles.inactive}`}>
-                    {selectedLink.status ? selectedLink.status.charAt(0).toUpperCase() + selectedLink.status.slice(1) : 'Active'}
+                  <span
+                    className={`${styles.status} ${
+                      selectedLink.status === "active"
+                        ? styles.active
+                        : styles.inactive
+                    }`}
+                  >
+                    {selectedLink.status
+                      ? selectedLink.status.charAt(0).toUpperCase() +
+                        selectedLink.status.slice(1)
+                      : "Active"}
                   </span>
                 </div>
                 <div className={styles.detailItem}>
