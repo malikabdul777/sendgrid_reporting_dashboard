@@ -12,19 +12,53 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('token'));
 
   useEffect(() => {
     // Check if user is logged in on app start
-    if (token) {
-      // You might want to validate the token with the backend here
+    const initializeAuth = async () => {
+      if (token) {
+        // If we have cached user data, use it immediately
+        const cachedUser = localStorage.getItem('user');
+        if (cachedUser) {
+          try {
+            setUser(JSON.parse(cachedUser));
+          } catch (error) {
+            console.error('Error parsing cached user data:', error);
+          }
+        }
+        
+        // Try to validate token with backend (optional)
+        try {
+          const response = await axiosInstance.get('/api/auth/me');
+          if (response.data.status === 'success') {
+            setUser(response.data.data.user);
+            localStorage.setItem('user', JSON.stringify(response.data.data.user));
+          }
+        } catch (error) {
+          console.error('Token validation error (using cached data):', error);
+          // Don't clear token/user on API failure - keep using cached data
+          // Only clear if we get a specific 401/403 response
+          if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            setToken(null);
+            setUser(null);
+          }
+        }
+      }
       setLoading(false);
-    } else {
-      setLoading(false);
-    }
-  }, [token]);
+    };
+
+    initializeAuth();
+  }, []);
+
+
 
   const login = async (email, password) => {
     try {
@@ -38,6 +72,7 @@ export const AuthProvider = ({ children }) => {
         setToken(authToken);
         setUser(data.user);
         localStorage.setItem('token', authToken);
+        localStorage.setItem('user', JSON.stringify(data.user));
         return { success: true, data: response.data };
       }
     } catch (error) {
@@ -60,6 +95,7 @@ export const AuthProvider = ({ children }) => {
       setToken(null);
       setUser(null);
       localStorage.removeItem('token');
+      localStorage.removeItem('user');
     }
   };
 
