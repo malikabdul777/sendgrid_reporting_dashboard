@@ -14,6 +14,9 @@ import { GiMagickTrick } from "react-icons/gi";
 import { IoIosMail } from "react-icons/io";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import { SiGmail } from "react-icons/si";
+import { BiLogOut, BiLogIn } from "react-icons/bi";
+import { useAuth } from "../../contexts/AuthContext";
+import { toast } from "react-toastify";
 
 // Utils
 
@@ -43,6 +46,16 @@ import styles from "./Sidebar.module.css";
 const Sidebar = () => {
   const { pathname } = useLocation();
   const [isToolsExpanded, setIsToolsExpanded] = useState(false);
+  const { logout, user, isAuthenticated } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success('Logged out successfully');
+    } catch (error) {
+      toast.error('Logout failed');
+    }
+  };
 
   // console.log(Cookies.get());
 
@@ -52,23 +65,25 @@ const Sidebar = () => {
         {/* <img src="./logo.png" alt="logo" className={styles.logo} /> */}
 
         <div className={styles.menu}>
-          <NavLink
-            to="domain-auth"
-            className={`${styles.navLink} ${
-              pathname === "/domain-auth" ? styles.activeNavLink : null
-            }`}
-            title={"Domain Auth"}
-          >
-            <div className={styles.item}>
-              <GoShieldLock
-                size={16}
-                className={`${
-                  pathname === "/domain-auth" ? styles.activeIcon : null
-                }`}
-              />
-              <p className={styles.navLinkText}>TRM Domains</p>
-            </div>
-          </NavLink>
+          {isAuthenticated && (
+            <NavLink
+              to="domain-auth"
+              className={`${styles.navLink} ${
+                pathname === "/domain-auth" ? styles.activeNavLink : null
+              }`}
+              title={"Domain Auth"}
+            >
+              <div className={styles.item}>
+                <GoShieldLock
+                  size={16}
+                  className={`${
+                    pathname === "/domain-auth" ? styles.activeIcon : null
+                  }`}
+                />
+                <p className={styles.navLinkText}>TRM Domains</p>
+              </div>
+            </NavLink>
+          )}
 
           <NavLink
             to="MIME-buster"
@@ -124,23 +139,25 @@ const Sidebar = () => {
             </div>
           </NavLink>
 
-          <NavLink
-            to="mailer"
-            className={`${styles.navLink} ${
-              pathname === "/mailer" ? styles.activeNavLink : null
-            }`}
-            title={"Mailer"}
-          >
-            <div className={styles.item}>
-              <IoIosMail
-                size={20}
-                className={`${
-                  pathname === "/mailer" ? styles.activeIcon : null
-                }`}
-              />
-              <p className={styles.navLinkText}>Mailer</p>
-            </div>
-          </NavLink>
+          {isAuthenticated && (
+            <NavLink
+              to="mailer"
+              className={`${styles.navLink} ${
+                pathname === "/mailer" ? styles.activeNavLink : null
+              }`}
+              title={"Mailer"}
+            >
+              <div className={styles.item}>
+                <IoIosMail
+                  size={20}
+                  className={`${
+                    pathname === "/mailer" ? styles.activeIcon : null
+                  }`}
+                />
+                <p className={styles.navLinkText}>Mailer</p>
+              </div>
+            </NavLink>
+          )}
 
           {/* Tools Dropdown */}
           <div className={styles.dropdownContainer}>
@@ -243,6 +260,37 @@ const Sidebar = () => {
               <p className={styles.navLinkText}>WF Blocks</p>
             </div>
           </NavLink> */}
+        </div>
+        
+        {/* User info and logout/login */}
+        <div className={styles.userSection}>
+          {isAuthenticated ? (
+            <>
+              {user && (
+                <div className={styles.userInfo}>
+                  <p className={styles.username}>{user.username}</p>
+                  <p className={styles.userEmail}>{user.email}</p>
+                </div>
+              )}
+              <button
+                onClick={handleLogout}
+                className={styles.logoutButton}
+                title="Logout"
+              >
+                <BiLogOut size={20} />
+                <span>Logout</span>
+              </button>
+            </>
+          ) : (
+            <NavLink
+              to="/auth"
+              className={styles.loginButton}
+              title="Sign In"
+            >
+              <BiLogIn size={20} />
+              <span>Sign In</span>
+            </NavLink>
+          )}
         </div>
       </div>
     </div>

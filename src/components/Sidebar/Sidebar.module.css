@@ -133,3 +133,75 @@
   background-color: var(--accentColorLight);
   font-weight: 500;
 }
+
+/* User section and logout styles */
+.userSection {
+  margin-top: auto;
+  padding: 20px;
+  border-top: 1px solid var(--lightGrey);
+  width: 100%;
+}
+
+.userInfo {
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.username {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--black);
+  margin: 0 0 4px 0;
+}
+
+.userEmail {
+  font-size: 12px;
+  color: var(--darkGrey);
+  margin: 0;
+  word-break: break-all;
+}
+
+.logoutButton {
+  width: 100%;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: none;
+  border: 1px solid var(--lightGrey);
+  border-radius: 8px;
+  color: var(--darkGrey);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logoutButton:hover {
+  background-color: #fee2e2;
+  border-color: #fca5a5;
+  color: #dc2626;
+}
+
+.loginButton {
+  width: 100%;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: none;
+  border: 1px solid var(--lightGrey);
+  border-radius: 8px;
+  color: var(--darkGrey);
+  font-size: 14px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.loginButton:hover {
+  background-color: #dbeafe;
+  border-color: #93c5fd;
+  color: #2563eb;
+}

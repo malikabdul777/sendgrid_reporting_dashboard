@@ -1,19 +1,22 @@
 // src/utils/axiosInstance.js
 import axios from "axios";
 
-// Define all three mandatory URLs
-const localURL = "http://localhost:3000"; // Local development URL
-const baseURL = "https://sendgrid-reporting-dashboard-server.onrender.com"; // Primary production URL
-const baseURL2 = "https://sendgrid-reporting-dashboard-servera2.onrender.com"; // Secondary production URL (used elsewhere in code)
+// Get URLs from environment variables
+const localURL = import.meta.env.VITE_LOCAL_URL || "http://localhost:3000";
+const baseURL1 =
+  import.meta.env.VITE_BASE_URL1 ||
+  "https://sendgrid-reporting-dashboard-server.onrender.com";
+const baseURL2 =
+  import.meta.env.VITE_BASE_URL2 ||
+  "https://sendgrid-reporting-dashboard-servera2.onrender.com";
 
 // Determine which baseURL to use for the axios instance
-// In a real production app, you might use environment variables instead
-const isDevelopment = process.env.NODE_ENV === "development";
+const isDevelopment = import.meta.env.MODE === "development";
 
 // Create axios instance with the appropriate baseURL
-// Use localURL for development, baseURL for production
+// Use localURL for development, baseURL1 for production
 const axiosInstance = axios.create({
-  baseURL: isDevelopment ? localURL : baseURL,
+  baseURL: isDevelopment ? localURL : baseURL1,
   timeout: 30000, // 30 seconds timeout
 });
 
@@ -22,12 +25,15 @@ console.log(
     isDevelopment ? "development" : "production"
   } mode)`
 );
-console.log(
-  `All available URLs: primary=${baseURL}, secondary=${baseURL2}, local=${localURL}`
-);
 
-// Add request interceptor for debugging
+// Add request interceptor for debugging and auth token
 axiosInstance.interceptors.request.use((config) => {
+  // Add auth token to requests if available
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
   console.log(
     `API Request: ${config.method.toUpperCase()} ${config.baseURL}${
       config.url
@@ -57,5 +63,6 @@ axiosInstance.interceptors.response.use(
 );
 
 // Export all URLs for use in components
-export { baseURL, baseURL2, localURL };
+// For backward compatibility, export baseURL1 as baseURL
+export { baseURL1 as baseURL, baseURL2, localURL };
 export default axiosInstance;
