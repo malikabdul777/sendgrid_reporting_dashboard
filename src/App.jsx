@@ -35,32 +35,38 @@ function App() {
           <Routes>
             {/* Public Routes */}
             <Route path="/auth" element={<Auth />} />
-            
+
             {/* Layout wrapper for all routes */}
             <Route path="/" element={<Layout />}>
               {/* Protected Routes */}
-              <Route path="domain-auth" element={
-                <ProtectedRoute>
-                  <DomainAuth />
-                </ProtectedRoute>
-              } />
-              <Route path="Mailer" element={
-                <ProtectedRoute>
-                  <Mailer />
-                </ProtectedRoute>
-              } />
-              
+              <Route
+                path="domain-auth"
+                element={
+                  <ProtectedRoute>
+                    <DomainAuth />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="Mailer"
+                element={
+                  <ProtectedRoute>
+                    <Mailer />
+                  </ProtectedRoute>
+                }
+              />
+
               {/* Public Routes within Layout */}
               <Route path="template_builder" element={<TemplateBuilder />} />
               <Route path="domain-logs" element={<DomainLogs />} />
               <Route path="spam-reporters" element={<Reporters />} />
               <Route path="webform-blocks-check" element={<WebformBlocks />} />
-              <Route path="TemplateRebuild" element={<TemplateRebuild />} />
+              <Route path="template-rebuild" element={<TemplateRebuild />} />
               <Route path="MIME-buster" element={<MIMEBuster />} />
               <Route path="tools/gmail-helper" element={<GmailHelper />} />
 
               {/* Fallback Route */}
-              <Route path="*" element={<Navigate to="/TemplateRebuild" />} />
+              <Route path="*" element={<Navigate to="/template-rebuild" />} />
             </Route>
           </Routes>
         </BrowserRouter>
