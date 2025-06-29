@@ -16,6 +16,7 @@ import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import { SiGmail } from "react-icons/si";
 import { BiLogOut, BiLogIn } from "react-icons/bi";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { FiLink } from "react-icons/fi";
 import { useAuth } from "../../contexts/AuthContext";
 import { toast } from "react-toastify";
 
@@ -160,6 +161,26 @@ const Sidebar = () => {
                   }`}
                 />
                 <p className={styles.navLinkText}>Mailer</p>
+              </div>
+            </NavLink>
+          )}
+
+          {isAuthenticated && (
+            <NavLink
+              to="short-links"
+              className={`${styles.navLink} ${
+                pathname === "/short-links" ? styles.activeNavLink : null
+              }`}
+              title={"Short Links"}
+            >
+              <div className={styles.item}>
+                <FiLink
+                  size={16}
+                  className={`${
+                    pathname === "/short-links" ? styles.activeIcon : null
+                  }`}
+                />
+                <p className={styles.navLinkText}>Short Links</p>
               </div>
             </NavLink>
           )}

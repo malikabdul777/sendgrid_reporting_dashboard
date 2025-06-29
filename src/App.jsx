@@ -22,6 +22,7 @@ import TemplateRebuild from "./pages/TemplateRebuild/TemplateRebuild";
 import MIMEBuster from "./pages/MIMEBuster/MIMEBuster";
 import Mailer from "./pages/Mailer/Mailer";
 import GmailHelper from "./pages/Tools/GmailHelper/GmailHelper";
+import ShortLinks from "./pages/ShortLinks/ShortLinks";
 
 // Toast
 import "react-toastify/dist/ReactToastify.css";
@@ -52,6 +53,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Mailer />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="short-links"
+                element={
+                  <ProtectedRoute>
+                    <ShortLinks />
                   </ProtectedRoute>
                 }
               />
