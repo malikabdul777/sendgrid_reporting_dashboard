@@ -205,3 +205,30 @@
   border-color: #93c5fd;
   color: #2563eb;
 }
+
+/* Spinner animation */
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Disabled logout button */
+.logoutButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.logoutButton:disabled:hover {
+  background: none;
+  border-color: var(--lightGrey);
+  color: var(--darkGrey);
+}

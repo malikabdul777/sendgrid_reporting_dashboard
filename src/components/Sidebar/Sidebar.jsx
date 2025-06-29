@@ -15,6 +15,7 @@ import { IoIosMail } from "react-icons/io";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import { SiGmail } from "react-icons/si";
 import { BiLogOut, BiLogIn } from "react-icons/bi";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { useAuth } from "../../contexts/AuthContext";
 import { toast } from "react-toastify";
 
@@ -46,14 +47,18 @@ import styles from "./Sidebar.module.css";
 const Sidebar = () => {
   const { pathname } = useLocation();
   const [isToolsExpanded, setIsToolsExpanded] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { logout, user, isAuthenticated } = useAuth();
 
   const handleLogout = async () => {
+    setIsLoggingOut(true);
     try {
       await logout();
       toast.success('Logged out successfully');
     } catch (error) {
       toast.error('Logout failed');
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 
@@ -276,9 +281,19 @@ const Sidebar = () => {
                 onClick={handleLogout}
                 className={styles.logoutButton}
                 title="Logout"
+                disabled={isLoggingOut}
               >
-                <BiLogOut size={20} />
-                <span>Logout</span>
+                {isLoggingOut ? (
+                  <>
+                    <AiOutlineLoading3Quarters size={20} className={styles.spinner} />
+                    <span>Logging out...</span>
+                  </>
+                ) : (
+                  <>
+                    <BiLogOut size={20} />
+                    <span>Logout</span>
+                  </>
+                )}
               </button>
             </>
           ) : (
